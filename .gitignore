@@ -1,0 +1,19 @@
+node_modules/
+.env/
+dist/
+dist/
+
+# Build
+build/
+
+# Unit Test
+# coverage/
+
+# Logs
+/logs
+
+test
+
+public/
+
+

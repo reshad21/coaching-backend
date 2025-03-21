@@ -1,0 +1,27 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "ES2020",                       // Update target to ES2020 or later
+    "lib": ["es6", "es2020"],                  // Include ES2020 in the lib array for newer features
+    "module": "ESNext",                        // Use ESNext module system (supports import.meta)
+    "types": ["node"],
+    "resolveJsonModule": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "outDir": "./build",                       // Set output directory for compiled code
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "removeComments": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@shared/*": ["../shared/*"]
+    }
+  },
+  "include": ["src/**/*", "prisma/**/*"],     // Include all relevant source code
+  "exclude": ["build", "coverage", "docs", "logs", "node_modules", "public", "__test__"]  // Exclude unnecessary files
+}
