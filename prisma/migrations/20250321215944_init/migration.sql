@@ -43,6 +43,7 @@ CREATE TABLE `Shift` (
 -- CreateTable
 CREATE TABLE `Student` (
     `id` VARCHAR(191) NOT NULL,
+    `studentId` VARCHAR(191) NOT NULL,
     `firstName` VARCHAR(191) NOT NULL,
     `lastName` VARCHAR(191) NULL,
     `fatherName` VARCHAR(191) NULL,
@@ -60,6 +61,7 @@ CREATE TABLE `Student` (
     `updatedAt` DATETIME(3) NOT NULL,
     `batchId` VARCHAR(191) NULL,
 
+    UNIQUE INDEX `Student_studentId_key`(`studentId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
