@@ -1,14 +1,11 @@
 import { Router } from "express";
+import testRouts from "./testRout/testRout";
 
 
-const unprotectedRoutes = [
-  {
-    path: "/login",
-  },
-];
+
 
 const protectedRoutes = [
-  { path: "/test", route: testRoutes },
+  { path: "/test", route: testRouts },
 
 
 ];
