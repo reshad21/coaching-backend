@@ -5,7 +5,7 @@ import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
 import { QueryBuilder } from "@/builders/builders";
 
-export const createStudentController = catchAsync(async (req, res) => {
+/* export const createStudentController = catchAsync(async (req, res) => {
   // const { studentName } = req?.body;
   const data = req.body;
 
@@ -33,7 +33,61 @@ export const createStudentController = catchAsync(async (req, res) => {
     message: "student Create Successfully",
     data: result,
   });
+}); */
+
+export const createStudentController = catchAsync(async (req, res) => {
+  const { firstName, lastName, phone, dateOfBirth } = req.body;
+
+  // Check if student with the same name, phone, and DOB exists
+  // const existingStudent = await prisma.student.findFirst({
+  //   where: {
+  //      firstName,
+  //      lastName,
+  //      phone,
+  //      dateOfBirth: new Date(dateOfBirth)
+  //   }
+  // });
+
+  // if (existingStudent) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "Student already exists!"
+  //   });
+  // }
+
+  // Generate Student ID (e.g., COACH-202503-0001)
+  const currentYearMonth = new Date().toISOString().slice(0, 7).replace("-", ""); // YYYYMM
+  const lastStudent = await prisma.student.findFirst({
+    where: {
+      studentId: { startsWith: `COACH-${currentYearMonth}` }
+    },
+    orderBy: { studentId: "desc" }
+  });
+
+  let nextNumber = "0001"; // Default if no previous student
+  if (lastStudent) {
+    const lastNumber = parseInt(lastStudent.studentId.slice(-4), 10);
+    nextNumber = String(lastNumber + 1).padStart(4, "0");
+  }
+
+  const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
+
+  // Create the new student with generated studentId
+  const student = await prisma.student.create({
+    data: {
+      studentId,
+      ...req.body
+    }
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Student created successfully",
+    data: student
+  });
 });
+
 
 export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
