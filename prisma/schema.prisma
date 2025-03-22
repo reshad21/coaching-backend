@@ -8,8 +8,73 @@ datasource db {
 }
 
 model Test {
-  id String @id @default(uuid())
+  id        String   @id @default(uuid())
   test      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Batch {
+  id        String    @id @default(uuid())
+  batchName String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Class     Class?    @relation(fields: [classId], references: [id])
+  classId   String?
+  Shift     Shift?    @relation(fields: [shiftId], references: [id])
+  shiftId   String?
+  students  Student[]
+}
+
+model Class {
+  id        String   @id @default(uuid())
+  className String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Batch     Batch[]
+}
+
+model Shift {
+  id        String   @id @default(uuid())
+  shiftName String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Batch     Batch[]
+}
+
+model Student {
+  id          String         @id @default(uuid())
+  studentId   String         @unique
+  firstName   String
+  lastName    String?
+  fatherName  String?
+  motherName  String?
+  dateOfBirth DateTime
+  religion    String?
+  phone       String
+  email       String
+  address     String?
+  image       String?
+  gender      String?
+  class       String?
+  Payment     PaymentMONTHLY
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  Batch       Batch?         @relation(fields: [batchId], references: [id])
+  batchId     String?
+}
+
+enum PaymentMONTHLY {
+  january
+  february
+  march
+  april
+  may
+  june
+  july
+  august
+  september
+  october
+  november
+  december
 }
