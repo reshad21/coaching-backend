@@ -7,7 +7,8 @@ import { globalErrorHandler } from "./middleware/golobalErrorHandler";
 import AppError from "./errors/AppError";
 import path from "path"; // Import path module
 import { fileURLToPath } from "url"; // Import for ES Modules compatibility
-import { seedAdminUser } from "./SeedUser/seedUser";
+import { seedUser } from "./SeedUser/seedUser";
+
 
 dotenv.config();
 const envFile =
@@ -71,6 +72,6 @@ app.use(notFound);
 app.use(globalErrorHandler);
 
 app.listen(port, () => {
-  // seedAdminUser();
+  seedUser();
   console.log(`${envName} Server is running on http://localhost:${port}`);
 });

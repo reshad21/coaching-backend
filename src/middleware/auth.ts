@@ -6,7 +6,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 import { Request } from "express";
 
 // Auth middleware with dynamic feature check
-const auth = (requiredFeature: Record<string, number[]>) => {
+const auth = () => {
   return catchAsync(async (req, res, next) => {
     const bearerToken = req.headers.authorization;
 
@@ -23,51 +23,14 @@ const auth = (requiredFeature: Record<string, number[]>) => {
 
     const { email} = decoded;
 
-    const userExists = await prisma.adminUser.findUnique({
+    const userExists = await prisma.admin.findFirst({
       where: {
         email: email,
-      },
-      include: {
-        Role: {
-          include: {
-            feature: true,
-          },
-        },
-      },
+      }
     });
 
-    const features = userExists?.Role?.feature;
-    const transformedFeature: Record<string, number[]> = {};
-
-    features?.forEach(({ name }) => {
-      const [category, number] = name.split("-");
-      if (!transformedFeature[category]) {
-        transformedFeature[category] = [];
-      }
-      transformedFeature[category].push(Number(number));
-    });
-
-    // logconsole.("Transformed Feature:", transformedFeature);
-    // console.log("Required Feature:", requiredFeature);
-
-    // Check if the required feature matches any feature in transformedFeature
-    let isMatch = false;
-
-    // Loop through each key in requiredFeature
-    for (const key in requiredFeature) {
-      if (transformedFeature[key]) {
-        // Loop through numbers in requiredFeature for the current category
-        for (let num of requiredFeature[key]) {
-          if (!transformedFeature[key].includes(num)) {
-            isMatch = false;
-            break;
-          }
-          isMatch = true;
-        }
-      }
-    }
-
-    if (!isMatch) {
+   
+    if (!userExists) {
       return res.status(401).json({
         statusCode: 401,
         success: false,
@@ -75,7 +38,7 @@ const auth = (requiredFeature: Record<string, number[]>) => {
       });
     }
     (req as Request & { user: JwtPayload }).user = decoded as JwtPayload;
-    // req.user = decoded as JwtPayload;
+    
     next();
   });
 };
