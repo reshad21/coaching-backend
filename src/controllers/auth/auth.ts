@@ -5,6 +5,7 @@ import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
 import AppError from "@/errors/AppError";
 import { generateToken } from "@/utils/jwt";
+import bcryptjs from 'bcryptjs'
 
 export const loginController = catchAsync(async (req, res) => {
   const data = req.body;
@@ -21,7 +22,6 @@ export const loginController = catchAsync(async (req, res) => {
       email: data?.email,
     },
   });
-  console.log(admin);
   
   if (!admin) {
     return res.status(400).json({
@@ -29,11 +29,15 @@ export const loginController = catchAsync(async (req, res) => {
       message: "Invalid Email!!",
     });
   }
+  const isPasswordMatch = bcryptjs.compareSync(
+    data.password,
+    admin?.password,
+  );
   
-  
-  if (admin?.password != data?.password) {
+  if (!isPasswordMatch) {
     throw new AppError(400, "wrong password");
   }
+  
   const adminEmail = admin?.email;
   const adminName = admin?.name;
   const adminPhone = admin?.phone;
