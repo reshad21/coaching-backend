@@ -5,13 +5,14 @@ import {
   getBatchControllerById,
   updateBatchController,
 } from "@/controllers/BatchController/batchController";
+import auth from "@/middleware/auth";
 
 import { Router } from "express";
 
 const batchRouts = Router();
 
-batchRouts.post("/", createBatchController);
-batchRouts.get("/", getAllBatchController);
+batchRouts.post("/",auth(), createBatchController);
+batchRouts.get("/",auth(), getAllBatchController);
 batchRouts.get("/:id", getBatchControllerById);
 batchRouts.patch("/:id", updateBatchController);
 batchRouts.delete("/:id", deleteBatchController);
