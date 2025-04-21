@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+import { QueryBuilder } from "@/builders/builders";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import { QueryBuilder } from "@/builders/builders";
 
 
 export const createStudentController = catchAsync(async (req, res) => {
@@ -47,11 +47,19 @@ export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
   const result = await new QueryBuilder("student", req.query)
-    .search(["firstName", "lastName"])
+    .search(["firstName", "lastName", "email", "phone", "schoolName"])
     .filter()
     .sort()
     .paginate()
     .fields()
+    .include({
+      Batch: true,
+      // Batch: {
+      //   select: {
+      //     batchName: true,
+      //   },
+      // },
+    })
     .execute();
 
   sendResponse(res, {

@@ -59,8 +59,9 @@ model Student {
   motherName  String?
   dateOfBirth DateTime
   religion    String?
+  schoolName  String?
   phone       String
-  email       String
+  email       String?
   address     String?
   image       String?
   gender      String?
