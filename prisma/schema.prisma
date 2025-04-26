@@ -66,24 +66,21 @@ model Student {
   image       String?
   gender      String?
   class       String?
-  Payment     PaymentMONTHLY
+  // Payment     PaymentMONTHLY[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
-  Batch       Batch?         @relation(fields: [batchId], references: [id])
+  Batch       Batch?         @relation(fields: [batchId], references: [id], onDelete: Cascade)
   batchId     String?
 }
 
-enum PaymentMONTHLY {
-  january
-  february
-  march
-  april
-  may
-  june
-  july
-  august
-  september
-  october
-  november
-  december
-}
+
+// model PaymentMONTHLY {
+//   id Int @id @default(autoincrement())
+//   title String
+//   amount Int
+//   month String
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   Student Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+//   studentId String?
+// }

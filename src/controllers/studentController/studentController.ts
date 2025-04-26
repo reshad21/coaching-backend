@@ -1,16 +1,42 @@
-import { PrismaClient } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 import { QueryBuilder } from "@/builders/builders";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
+import AppError from "@/errors/AppError";
+import uploadImage from "@/utils/uploadImage";
 
 
 export const createStudentController = catchAsync(async (req, res) => {
-  const { firstName, lastName, phone, dateOfBirth } = req.body;
+  const {
+    firstName,
+    lastName,
+    fatherName,
+    motherName,
+    dateOfBirth,
+    religion,
+    schoolName,
+    phone,
+    email,
+    address,
+    image,
+    gender,
+    class: className,
+    batchId,
+  } = req.body;
 
-  // Generate Student ID (e.g., COACH-202503-0001)
-  const currentYearMonth = new Date().toISOString().slice(0, 7).replace("-", ""); // YYYYMM
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+  if (!files.image || files.image.length === 0) {
+    throw new AppError(400, "No profile image uploaded");
+  }
+
+  const imageUrl = await uploadImage(files.image[0]);
+
+
+  // Generate Student ID (e.g., COACH-202504-0001)
+  const currentYearMonth = new Date().toISOString().slice(0, 7).replace("-", "");
   const lastStudent = await prisma.student.findFirst({
     where: {
       studentId: { startsWith: `COACH-${currentYearMonth}` }
@@ -18,7 +44,7 @@ export const createStudentController = catchAsync(async (req, res) => {
     orderBy: { studentId: "desc" }
   });
 
-  let nextNumber = "0001"; // Default if no previous student
+  let nextNumber = "0001";
   if (lastStudent) {
     const lastNumber = parseInt(lastStudent.studentId.slice(-4), 10);
     nextNumber = String(lastNumber + 1).padStart(4, "0");
@@ -26,19 +52,31 @@ export const createStudentController = catchAsync(async (req, res) => {
 
   const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
 
-  // Create the new student with generated studentId
-  const student = await prisma.student.create({
+  const newStudent = await prisma.student.create({
     data: {
       studentId,
-      ...req.body
-    }
+      image: imageUrl,
+      firstName,
+      lastName,
+      fatherName,
+      motherName,
+      dateOfBirth: new Date(dateOfBirth), // ensure it's Date
+      religion,
+      schoolName,
+      phone,
+      email,
+      address,
+      gender,
+      class: className,
+      batchId
+    },
   });
-
+  
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Student created successfully",
-    data: student
+    data: newStudent,
   });
 });
 
