@@ -5,6 +5,7 @@ import shiftRouts from "./shiftRoutes/shiftRoutes";
 import batchRouts from "./batchRoutes/batchRoutes";
 import studentRouts from "./studentRoutes/studentRoutes";
 import authRouts from "./auth.rout";
+import bulkSmsRouts from "./bulkSma/bulkSma.rout";
 
 const protectedRoutes = [
   { path: "/test", route: testRouts },
@@ -13,6 +14,7 @@ const protectedRoutes = [
   { path: "/shift", route: shiftRouts },
   { path: "/batch", route: batchRouts },
   { path: "/student", route: studentRouts },
+  { path: "/bulk", route: bulkSmsRouts },
 ];
 
 const mainRouter = Router();
