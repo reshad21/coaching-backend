@@ -1,10 +1,10 @@
-import { Prisma, PrismaClient } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 import { QueryBuilder } from "@/builders/builders";
+import AppError from "@/errors/AppError";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import AppError from "@/errors/AppError";
 import uploadImage from "@/utils/uploadImage";
 
 
@@ -24,6 +24,7 @@ export const createStudentController = catchAsync(async (req, res) => {
     gender,
     class: className,
     batchId,
+    batchName,
   } = req.body;
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
@@ -52,6 +53,16 @@ export const createStudentController = catchAsync(async (req, res) => {
 
   const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
 
+  // Fetch batch name using batchId
+  const batch = await prisma.batch.findFirst({
+    where: { id: batchId },
+  });
+
+  if (!batch) {
+    throw new AppError(404, "Batch not found");
+  }
+
+
   const newStudent = await prisma.student.create({
     data: {
       studentId,
@@ -68,10 +79,11 @@ export const createStudentController = catchAsync(async (req, res) => {
       address,
       gender,
       class: className,
-      batchId
+      batchId,
+      batchName: batch?.batchName,
     },
   });
-  
+
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -92,11 +104,6 @@ export const getAllStudentController = catchAsync(async (req, res) => {
     .fields()
     .include({
       Batch: true,
-      // Batch: {
-      //   select: {
-      //     batchName: true,
-      //   },
-      // },
     })
     .execute();
 
