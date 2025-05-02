@@ -33,20 +33,6 @@ export const createBatchController = catchAsync(async (req, res) => {
 });
 
 export const getAllBatchController = catchAsync(async (req, res) => {
-  // const result = await prisma.batch.findMany({
-    // include: {
-    //   Class: {
-    //     select: {
-    //       className: true,
-    //     },
-    //   },
-    //   Shift: {
-    //     select: {
-    //       shiftName: true,
-    //     },
-    //   },
-    // },
-  // });
   
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])

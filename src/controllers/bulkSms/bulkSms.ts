@@ -36,3 +36,30 @@ export const bulkController = catchAsync(async (req, res) => {
     data: data,
   });
 });
+export const classBulkMsgController = catchAsync(async (req, res) => {
+  const { message,id } = req.body;
+  const apiKey = process.env.API_KEY;
+  const senderId = process.env.SENDER_ID;
+
+  const response = await prisma.batch.findFirst({
+    where: {
+      id ,
+    },
+    include:{
+     students:{
+      select:{
+        phone:true
+      }
+     }
+    }
+  });
+  const phones = response?.students?.map(s => s.phone).join(',');
+  console.log(phones);
+  
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Class Create Successfully",
+    data: response?.students,
+  });
+});
