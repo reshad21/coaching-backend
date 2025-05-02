@@ -74,6 +74,7 @@ CREATE TABLE `Student` (
     `updatedAt` DATETIME(3) NOT NULL,
     `batchId` VARCHAR(191) NULL,
     `batchName` VARCHAR(191) NULL,
+    `classId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Student_studentId_key`(`studentId`),
     PRIMARY KEY (`id`)
@@ -100,6 +101,9 @@ ALTER TABLE `Batch` ADD CONSTRAINT `Batch_shiftId_fkey` FOREIGN KEY (`shiftId`) 
 
 -- AddForeignKey
 ALTER TABLE `Student` ADD CONSTRAINT `Student_batchId_fkey` FOREIGN KEY (`batchId`) REFERENCES `Batch`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Student` ADD CONSTRAINT `Student_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Class`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_studentId_fkey` FOREIGN KEY (`studentId`) REFERENCES `Student`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

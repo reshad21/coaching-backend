@@ -37,11 +37,12 @@ model Batch {
 }
 
 model Class {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   className String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Batch     Batch[]
+  Student   Student[]
 }
 
 model Shift {
@@ -74,6 +75,8 @@ model Student {
   Batch       Batch?    @relation(fields: [batchId], references: [id], onDelete: Cascade)
   batchName   String? //it will place by backend when student create
   Payment     Payment[]
+  Class       Class?    @relation(fields: [classId], references: [id])
+  classId     String?
 }
 
 model Payment {
