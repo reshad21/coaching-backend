@@ -13,15 +13,17 @@ model Test {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-model Admin{
-  id String   @id @default(uuid())
-  name String
-  email String
-  phone String
-  password String 
+
+model Admin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 model Batch {
   id        String    @id @default(uuid())
   batchName String?
@@ -35,11 +37,12 @@ model Batch {
 }
 
 model Class {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   className String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Batch     Batch[]
+  Student   Student[]
 }
 
 model Shift {
@@ -51,38 +54,38 @@ model Shift {
 }
 
 model Student {
-  id          String         @id @default(uuid())
-  studentId   String         @unique
+  id          String    @id @default(uuid())
+  studentId   String    @unique
   firstName   String
   lastName    String?
   fatherName  String?
   motherName  String?
   dateOfBirth DateTime
   religion    String?
+  schoolName  String?
   phone       String
-  email       String
+  email       String?
   address     String?
   image       String?
   gender      String?
   class       String?
-  Payment     PaymentMONTHLY
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  Batch       Batch?         @relation(fields: [batchId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   batchId     String?
+  Batch       Batch?    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  batchName   String? //it will place by backend when student create
+  Payment     Payment[]
+  Class       Class?    @relation(fields: [classId], references: [id])
+  classId     String?
 }
 
-enum PaymentMONTHLY {
-  january
-  february
-  march
-  april
-  may
-  june
-  july
-  august
-  september
-  october
-  november
-  december
+model Payment {
+  id        Int      @id @default(autoincrement())
+  title     String
+  amount    Int
+  month     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  studentId String?
+  Student   Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }

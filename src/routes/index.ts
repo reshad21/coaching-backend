@@ -1,5 +1,4 @@
 import { Router } from "express";
-import testRouts from "./testRout/testRout";
 import classRouts from "./classRoutes/classRoutes";
 import shiftRouts from "./shiftRoutes/shiftRoutes";
 import batchRouts from "./batchRoutes/batchRoutes";
@@ -8,7 +7,6 @@ import authRouts from "./auth.rout";
 import bulkSmsRouts from "./bulkSma/bulkSma.rout";
 
 const protectedRoutes = [
-  { path: "/test", route: testRouts },
   { path: "/login", route: authRouts },
   { path: "/class", route: classRouts },
   { path: "/shift", route: shiftRouts },

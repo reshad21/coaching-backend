@@ -6,23 +6,22 @@ import sendResponse from "@/utils/sendResponse";
 import { QueryBuilder } from "@/builders/builders";
 
 export const createBatchController = catchAsync(async (req, res) => {
-  // const { batchName } = req?.body;
-   const data = req.body;
+  const data = req.body;
 
-  const findBatch = await prisma.batch.findFirst({
-    where: {
-      batchName: data.batchName,
-    },
-  });
-  if (findBatch) {
-    return res.status(400).json({
-      success: false,
-      message: "batch already exists !!",
-    });
-  }
+  // const findBatch = await prisma.batch.findFirst({
+  //   where: {
+  //     batchName: data.batchName,
+  //   },
+  // });
+  // if (findBatch) {
+  //   return res.status(400).json({
+  //     success: false,
+  //     message: "batch already exists !!",
+  //   });
+  // }
 
   const result = await prisma.batch.create({
-    data
+    data,
   });
 
   sendResponse(res, {
@@ -34,14 +33,40 @@ export const createBatchController = catchAsync(async (req, res) => {
 });
 
 export const getAllBatchController = catchAsync(async (req, res) => {
-  // const result = await prisma.batch.findMany();
-
+  // const result = await prisma.batch.findMany({
+    // include: {
+    //   Class: {
+    //     select: {
+    //       className: true,
+    //     },
+    //   },
+    //   Shift: {
+    //     select: {
+    //       shiftName: true,
+    //     },
+    //   },
+    // },
+  // });
+  
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
     .filter()
     .sort()
     .paginate()
     .fields()
+    .include({
+      Class:{
+        select: {
+          className: true
+        }
+      },
+      Shift: {
+        select: {
+          shiftName: true,
+        },
+      },
+
+    })
     .execute();
 
   sendResponse(res, {
@@ -51,6 +76,7 @@ export const getAllBatchController = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
 
 export const getBatchControllerById = catchAsync(async (req, res) => {
   const { id } = req?.params;
