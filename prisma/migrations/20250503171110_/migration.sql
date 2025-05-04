@@ -24,12 +24,13 @@ CREATE TABLE `Admin` (
 -- CreateTable
 CREATE TABLE `Batch` (
     `id` VARCHAR(191) NOT NULL,
-    `batchName` VARCHAR(191) NULL,
+    `batchName` VARCHAR(191) NOT NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
     `classId` VARCHAR(191) NULL,
     `shiftId` VARCHAR(191) NULL,
 
+    UNIQUE INDEX `Batch_batchName_key`(`batchName`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -69,12 +70,14 @@ CREATE TABLE `Student` (
     `address` VARCHAR(191) NULL,
     `image` VARCHAR(191) NULL,
     `gender` VARCHAR(191) NULL,
-    `class` VARCHAR(191) NULL,
     `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updatedAt` DATETIME(3) NOT NULL,
-    `batchId` VARCHAR(191) NULL,
     `batchName` VARCHAR(191) NULL,
+    `className` VARCHAR(191) NULL,
+    `shiftName` VARCHAR(191) NULL,
     `classId` VARCHAR(191) NULL,
+    `batchId` VARCHAR(191) NULL,
+    `shiftId` VARCHAR(191) NULL,
 
     UNIQUE INDEX `Student_studentId_key`(`studentId`),
     PRIMARY KEY (`id`)
@@ -100,10 +103,13 @@ ALTER TABLE `Batch` ADD CONSTRAINT `Batch_classId_fkey` FOREIGN KEY (`classId`) 
 ALTER TABLE `Batch` ADD CONSTRAINT `Batch_shiftId_fkey` FOREIGN KEY (`shiftId`) REFERENCES `Shift`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Student` ADD CONSTRAINT `Student_batchId_fkey` FOREIGN KEY (`batchId`) REFERENCES `Batch`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `Student` ADD CONSTRAINT `Student_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Class`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `Student` ADD CONSTRAINT `Student_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Class`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE `Student` ADD CONSTRAINT `Student_batchId_fkey` FOREIGN KEY (`batchId`) REFERENCES `Batch`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `Student` ADD CONSTRAINT `Student_shiftId_fkey` FOREIGN KEY (`shiftId`) REFERENCES `Shift`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `Payment` ADD CONSTRAINT `Payment_studentId_fkey` FOREIGN KEY (`studentId`) REFERENCES `Student`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

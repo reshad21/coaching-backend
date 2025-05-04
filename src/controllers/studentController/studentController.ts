@@ -10,22 +10,13 @@ import uploadImage from "@/utils/uploadImage";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {
-    firstName,
-    lastName,
-    fatherName,
-    motherName,
     dateOfBirth,
-    religion,
-    schoolName,
-    phone,
-    email,
-    address,
-    image,
-    gender,
-    class: className,
+    classId,
     batchId,
-    batchName,
+    shiftId,
   } = req.body;
+  
+  const body = req.body;
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
@@ -54,35 +45,45 @@ export const createStudentController = catchAsync(async (req, res) => {
   const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
 
   // Fetch batch name using batchId
-  const batch = await prisma.batch.findFirst({
+  const findBatch = await prisma.batch.findFirst({
     where: { id: batchId },
   });
 
-  if (!batch) {
+  if (!findBatch) {
     throw new AppError(404, "Batch not found");
   }
 
+  // Fetch class name using classId
+  const findclass = await prisma.class.findFirst({
+    where: { id: classId },
+  })
+
+  if (!findclass) {
+    throw new AppError(404, "Class not found");
+  }
+
+  // Fetch shift name using shiftId
+  const findShift = await prisma.shift.findFirst({
+    where: { id: shiftId }
+  })
+
+  if (!findShift) {
+    throw new AppError(404, "Shift not found");
+  }
 
   const newStudent = await prisma.student.create({
     data: {
       studentId,
       image: imageUrl,
-      firstName,
-      lastName,
-      fatherName,
-      motherName,
-      dateOfBirth: new Date(dateOfBirth), // ensure it's Date
-      religion,
-      schoolName,
-      phone,
-      email,
-      address,
-      gender,
-      class: className,
-      batchId,
-      batchName: batch?.batchName,
+      dateOfBirth: new Date(dateOfBirth),
+      batchName: findBatch?.batchName,
+      className: findclass?.className,
+      shiftName: findShift?.shiftName,
+      ...body
     },
   });
+
+
 
   sendResponse(res, {
     statusCode: 200,
@@ -104,6 +105,7 @@ export const getAllStudentController = catchAsync(async (req, res) => {
     .fields()
     .include({
       Batch: true,
+      Class: true
     })
     .execute();
 
