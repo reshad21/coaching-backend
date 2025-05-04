@@ -34,20 +34,20 @@ export const createBatchController = catchAsync(async (req, res) => {
 
 export const getAllBatchController = catchAsync(async (req, res) => {
   // const result = await prisma.batch.findMany({
-    // include: {
-    //   Class: {
-    //     select: {
-    //       className: true,
-    //     },
-    //   },
-    //   Shift: {
-    //     select: {
-    //       shiftName: true,
-    //     },
-    //   },
-    // },
+  // include: {
+  //   Class: {
+  //     select: {
+  //       className: true,
+  //     },
+  //   },
+  //   Shift: {
+  //     select: {
+  //       shiftName: true,
+  //     },
+  //   },
+  // },
   // });
-  
+
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
     .filter()
@@ -55,17 +55,17 @@ export const getAllBatchController = catchAsync(async (req, res) => {
     .paginate()
     .fields()
     .include({
-      Class:{
+      Class: {
         select: {
-          className: true
-        }
+          className: true,
+        },
       },
       Shift: {
         select: {
           shiftName: true,
         },
       },
-
+      students: true,
     })
     .execute();
 
@@ -76,7 +76,6 @@ export const getAllBatchController = catchAsync(async (req, res) => {
     data: result,
   });
 });
-
 
 export const getBatchControllerById = catchAsync(async (req, res) => {
   const { id } = req?.params;
