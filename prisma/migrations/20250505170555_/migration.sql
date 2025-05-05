@@ -30,7 +30,6 @@ CREATE TABLE `Batch` (
     `classId` VARCHAR(191) NULL,
     `shiftId` VARCHAR(191) NULL,
 
-    UNIQUE INDEX `Batch_batchName_key`(`batchName`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -20,6 +20,20 @@ export class QueryBuilder<T extends keyof PrismaClient> {
     } as Prisma.Args<PrismaClient[T], "findMany">;
   }
 
+   // Add this new method
+  select(fields: Record<string, boolean>) {
+    this.options.select = fields;
+    return this;
+  }
+
+
+  addManualFilter(filter: Record<string, any>) {
+    this.options.where = {
+      ...this.options.where,
+      ...filter,
+    };
+    return this;
+  }
   search(defaultFields: string[] = []) {
     if (this.query.search) {
       const searchQueries = Array.isArray(this.query.search)
@@ -32,7 +46,9 @@ export class QueryBuilder<T extends keyof PrismaClient> {
   
       if (!fields.length) return this;
   
-      const validEnumValues = [
+      const noticeValidEnumValues = ["ONLINE", "GENERAL", "COMMON"];
+      const noticeAudienceValidEnumValues = ["TEACHER", "STUDENT", "BOTH"];
+      const profExamEnumValues = [
         "First_Prof_Exam",
         "Second_Prof_Exam",
         "Third_Prof_Exam",
@@ -40,24 +56,47 @@ export class QueryBuilder<T extends keyof PrismaClient> {
       ];
   
       const conditions = searchQueries.map((searchQuery) => ({
-        OR: fields.map((field:any) => {
-          if (field === "ProfExamNumber") {
-            return validEnumValues.includes(searchQuery)
-              ? { [field]: { equals: searchQuery } }
-              : {}; 
-          }
-          return {
-            [field]: {
-              contains: searchQuery.trim(),
-            },
-          };
-        }),
+        OR: fields
+          .map((field: string) => {
+            const trimmedQuery = searchQuery.trim();
+  
+            if (field === "category") {
+              return noticeValidEnumValues.includes(trimmedQuery.toUpperCase())
+                ? { [field]: { equals: trimmedQuery.toUpperCase() } }
+                : null;
+            }
+  
+            if (field === "targetedAudience") {
+              return noticeAudienceValidEnumValues.includes(trimmedQuery.toUpperCase())
+                ? { [field]: { equals: trimmedQuery.toUpperCase() } }
+                : null;
+            }
+  
+            if (field === "ProfExamNumber") {
+              return profExamEnumValues.includes(trimmedQuery)
+                ? { [field]: { equals: trimmedQuery } }
+                : null;
+            }
+  
+            if (field === "batch") {
+              // "batch" is a relation, can't apply `contains` directly
+              return null;
+            }
+  
+            return {
+              [field]: {
+                contains: trimmedQuery,
+              },
+            };
+          })
+          .filter(Boolean), // remove nulls
       }));
   
       (this.options.where as any).AND = conditions;
     }
     return this;
   }
+  
   
   
 
@@ -127,6 +166,36 @@ export class QueryBuilder<T extends keyof PrismaClient> {
   }
 
   async execute() {
-    return (this.model as any).findMany(this.options);
+    const page = parseInt(this.query.page);
+    const limit = parseInt(this.query.limit);
+    const hasPagination = !isNaN(page) && !isNaN(limit);
+  
+    if (hasPagination) {
+      this.options.take = limit;
+      this.options.skip = (page - 1) * limit;
+  
+      const [data, total] = await Promise.all([
+        (this.model as any).findMany(this.options),
+        (this.model as any).count({ where: this.options.where }),
+      ]);
+  
+      const totalPages = Math.ceil(total / limit);
+  
+      return {
+        meta: {
+          total,
+          page,
+          limit,
+          totalPages,
+        },
+        data,
+      };
+    }
+  
+    // Remove take/skip if not paginating to avoid Prisma interpreting undefined
+    const { take, skip, ...restOptions } = this.options;
+  
+    return (this.model as any).findMany(restOptions);
   }
+  
 }
