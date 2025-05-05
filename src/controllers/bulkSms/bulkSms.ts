@@ -36,7 +36,7 @@ export const bulkController = catchAsync(async (req, res) => {
     data: data,
   });
 });
-export const classBulkMsgController = catchAsync(async (req, res) => {
+export const batchBulkMsgController = catchAsync(async (req, res) => {
   const { message,id } = req.body;
   const apiKey = process.env.API_KEY;
   const senderId = process.env.SENDER_ID;
@@ -53,13 +53,87 @@ export const classBulkMsgController = catchAsync(async (req, res) => {
      }
     }
   });
-  const phones = response?.students?.map(s => s.phone).join(',');
-  console.log(phones);
-  
+  const phoneNumbers = response?.students?.map(s => s.phone).join(',');
+  if (!phoneNumbers) {
+    throw new AppError(404,"No students found for this class or batch")
+  }
+  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
+
+  const result = await fetch(url, {
+    method: "GET",
+  });
+
+  if (!result.ok) {
+    throw new AppError(500, "Failed to send Bulk SMS");
+  }
+  const data = await result.json();
+ 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Class Create Successfully",
-    data: response?.students,
+    message: "Send Message Successfully",
+    data: data, 
+  });
+});
+export const classBulkMsgController = catchAsync(async (req, res) => {
+  const { message,id } = req.body;
+  const apiKey = process.env.API_KEY;
+  const senderId = process.env.SENDER_ID;
+
+  const response = await prisma.class.findFirst({
+    where: {
+      id:"b1d1f492-dc97-47d7-9d3c-5eda513f6fb1" ,
+    },
+    include:{
+     Student:true
+    }
+  });
+  // const phoneNumbers = response?.students?.map(s => s.phone).join(',');
+  // if (!phoneNumbers) {
+  //   throw new AppError(404,"No students found for this class or batch")
+  // }
+  // const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
+
+  // const result = await fetch(url, {
+  //   method: "GET",
+  // });
+
+  // if (!result.ok) {
+  //   throw new AppError(500, "Failed to send Bulk SMS");
+  // }
+  // const data = await result.json();
+ 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Send Message Successfully",
+    data: response, 
+  });
+});
+export const singleMessageMsgController = catchAsync(async (req, res) => {
+  const { message,number} = req.body;
+  const apiKey = process.env.API_KEY;
+  const senderId = process.env.SENDER_ID;
+
+  
+  if (!number) {
+    throw new AppError(404,"No students found for this class or batch")
+  }
+  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(number)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
+
+  const result = await fetch(url, {
+    method: "GET",
+  });
+
+  if (!result.ok) {
+    throw new AppError(500, "Failed to send SMS");
+  }
+  const data = await result.json();
+ 
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Send Message Successfully",
+    data: data, 
   });
 });
