@@ -12,6 +12,8 @@ export const createStudentController = catchAsync(async (req, res) => {
 
   const body = req.body;
 
+  console.log(req.body,"here is body ");
+  
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
   if (!files.image || files.image.length === 0) {
