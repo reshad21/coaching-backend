@@ -21,7 +21,7 @@ export const globalErrorHandler: ErrorRequestHandler = (
   let errorSources: TErrorSources = [
     {
       path: '',
-      message: '' || 'Something went wrong',
+      message: 'Something went wrong',
     },
   ];
 
