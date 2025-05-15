@@ -48,7 +48,6 @@ export const getAllBatchController = catchAsync(async (req, res) => {
   // },
   // });
 
-  
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
     .filter()

@@ -1,4 +1,4 @@
-import { batchBulkMsgController, bulkController, classBulkMsgController, singleMessageMsgController } from "@/controllers/bulkSms/bulkSms";
+import { batchBulkMsgController, bulkController, classBulkMsgController, shiftBulkMsgController, singleMessageMsgController } from "@/controllers/bulkSms/bulkSms";
 import { Router } from "express";
 
 const bulkSmsRouts = Router();
@@ -6,6 +6,7 @@ const bulkSmsRouts = Router();
 
 bulkSmsRouts.get("/", bulkController);
 bulkSmsRouts.post("/class", classBulkMsgController);
+bulkSmsRouts.post("/shift", shiftBulkMsgController);
 bulkSmsRouts.post("/batch", batchBulkMsgController);
 bulkSmsRouts.post("/single-student", singleMessageMsgController);
 
