@@ -33,21 +33,7 @@ export const createBatchController = catchAsync(async (req, res) => {
 });
 
 export const getAllBatchController = catchAsync(async (req, res) => {
-  // const result = await prisma.batch.findMany({
-  // include: {
-  //   Class: {
-  //     select: {
-  //       className: true,
-  //     },
-  //   },
-  //   Shift: {
-  //     select: {
-  //       shiftName: true,
-  //     },
-  //   },
-  // },
-  // });
-
+  
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
     .filter()
@@ -90,6 +76,36 @@ export const getBatchControllerById = catchAsync(async (req, res) => {
     statusCode: 200,
     success: true,
     message: "Get single batch successful",
+    data: result,
+  });
+});
+export const getBatchInfoControllerById = catchAsync(async (req, res) => {
+  const { id } = req?.params;
+
+  const result = await prisma.batch.findFirst({
+    where: {
+      id,
+    },
+    select:{
+      Class:{
+        select:{
+          className:true,
+          id:true
+        }
+      },
+      Shift:{
+        select:{
+          shiftName:true,
+          id:true
+        }
+      }
+    }
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Get single batch info successful",
     data: result,
   });
 });
