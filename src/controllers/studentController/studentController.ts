@@ -8,9 +8,14 @@ import sendResponse from "@/utils/sendResponse";
 import uploadImage from "@/utils/uploadImage";
 
 export const createStudentController = catchAsync(async (req, res) => {
-  const { dateOfBirth, classId, batchId, shiftId, admissionFees } = req.body;
-
-  const body = req.body;
+  const {
+    dateOfBirth,
+    classId,
+    batchId,
+    shiftId,
+    admissionFees,
+    ...restBody
+  } = req.body;
 
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
@@ -44,8 +49,6 @@ export const createStudentController = catchAsync(async (req, res) => {
   const findBatch = await prisma.batch.findFirst({
     where: { id: batchId },
   });
-
-
   if (!findBatch) {
     throw new AppError(404, "Batch not found");
   }
@@ -54,7 +57,6 @@ export const createStudentController = catchAsync(async (req, res) => {
   const findclass = await prisma.class.findFirst({
     where: { id: classId },
   });
-
   if (!findclass) {
     throw new AppError(404, "Class not found");
   }
@@ -63,7 +65,6 @@ export const createStudentController = catchAsync(async (req, res) => {
   const findShift = await prisma.shift.findFirst({
     where: { id: shiftId },
   });
-
   if (!findShift) {
     throw new AppError(404, "Shift not found");
   }
@@ -76,8 +77,11 @@ export const createStudentController = catchAsync(async (req, res) => {
       batchName: findBatch?.batchName,
       className: findclass?.className,
       shiftName: findShift?.shiftName,
-      admissionFees: Number(admissionFees),
-      ...body,
+      admissionFees: Number(admissionFees), // ✅ Convert to number
+      batchId,
+      classId,
+      shiftId,
+      ...restBody,
     },
   });
 
@@ -88,6 +92,7 @@ export const createStudentController = catchAsync(async (req, res) => {
     data: newStudent,
   });
 });
+
 
 export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
