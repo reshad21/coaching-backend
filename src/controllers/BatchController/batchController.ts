@@ -1,24 +1,24 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+import { QueryBuilder } from "@/builders/builders";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import { QueryBuilder } from "@/builders/builders";
 
 export const createBatchController = catchAsync(async (req, res) => {
   const data = req.body;
 
-  // const findBatch = await prisma.batch.findFirst({
-  //   where: {
-  //     batchName: data.batchName,
-  //   },
-  // });
-  // if (findBatch) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "batch already exists !!",
-  //   });
-  // }
+  const findBatch = await prisma.batch.findFirst({
+    where: {
+      batchName: data.batchName,
+    },
+  });
+  if (findBatch) {
+    return res.status(400).json({
+      success: false,
+      message: "Batch already exists !!",
+    });
+  }
 
   const result = await prisma.batch.create({
     data,
@@ -27,13 +27,13 @@ export const createBatchController = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "batch Create Successfully",
+    message: "Batch Create Successfully",
     data: result,
   });
 });
 
 export const getAllBatchController = catchAsync(async (req, res) => {
-  
+
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
     .filter()
@@ -86,17 +86,17 @@ export const getBatchInfoControllerById = catchAsync(async (req, res) => {
     where: {
       id,
     },
-    select:{
-      Class:{
-        select:{
-          className:true,
-          id:true
+    select: {
+      Class: {
+        select: {
+          className: true,
+          id: true
         }
       },
-      Shift:{
-        select:{
-          shiftName:true,
-          id:true
+      Shift: {
+        select: {
+          shiftName: true,
+          id: true
         }
       }
     }

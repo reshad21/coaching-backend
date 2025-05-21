@@ -8,10 +8,10 @@ import sendResponse from "@/utils/sendResponse";
 import uploadImage from "@/utils/uploadImage";
 
 export const createStudentController = catchAsync(async (req, res) => {
-  const { dateOfBirth, classId, batchId, shiftId } = req.body;
+  const { dateOfBirth, classId, batchId, shiftId, admissionFees } = req.body;
 
   const body = req.body;
-  
+
   const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
   if (!files.image || files.image.length === 0) {
@@ -76,6 +76,7 @@ export const createStudentController = catchAsync(async (req, res) => {
       batchName: findBatch?.batchName,
       className: findclass?.className,
       shiftName: findShift?.shiftName,
+      admissionFees: Number(admissionFees),
       ...body,
     },
   });

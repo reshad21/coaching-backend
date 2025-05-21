@@ -54,41 +54,40 @@ model Shift {
   Student   Student[]
 }
 
-
 model Student {
-  id          String    @id @default(uuid())
-  studentId   String    @unique
-  firstName   String
-  lastName    String?
-  fatherName  String?
-  motherName  String?
-  dateOfBirth DateTime
-  religion    String?
-  schoolName  String?
-  phone       String
-  email       String?
-  address     String?
-  image       String?
-  gender      String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  batchName   String? //it will place by backend when student create
-  className   String?
-  shiftName   String?
-  Payment     Payment[]
-  Class       Class?    @relation(fields: [classId], references: [id])
-  classId     String?
-  Batch       Batch?    @relation(fields: [batchId], references: [id])
-  batchId     String?
-  Shift       Shift?    @relation(fields: [shiftId], references: [id])
-  shiftId     String?
+  id            String    @id @default(uuid())
+  studentId     String    @unique
+  firstName     String
+  lastName      String?
+  fatherName    String?
+  motherName    String?
+  dateOfBirth   DateTime
+  religion      String?
+  schoolName    String?
+  phone         String
+  admissionFees Int
+  address       String?
+  image         String?
+  gender        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  batchName     String? //it will place by backend when student create
+  className     String?
+  shiftName     String?
+  Payment       Payment[]
+  Class         Class?    @relation(fields: [classId], references: [id])
+  classId       String?
+  Batch         Batch?    @relation(fields: [batchId], references: [id])
+  batchId       String?
+  Shift         Shift?    @relation(fields: [shiftId], references: [id])
+  shiftId       String?
 }
 
 model Payment {
   id        Int      @id @default(autoincrement())
   title     String
   amount    Int
-  month     String
+  month     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   studentId String?
