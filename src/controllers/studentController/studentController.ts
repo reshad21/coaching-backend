@@ -98,7 +98,7 @@ export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
   const result = await new QueryBuilder("student", req.query)
-    .search(["firstName", "lastName", "email", "phone", "schoolName"])
+    .search(["firstName", "lastName", "phone", "schoolName", "studentId"])
     .filter()
     .sort()
     .paginate()
