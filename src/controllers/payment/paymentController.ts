@@ -33,7 +33,9 @@ export const getAllStudentPaymentController = catchAsync(async (req, res) => {
         .sort()
         .paginate()
         .fields()
-        .include()
+        .include({
+            Student: true
+        })
         .execute();
 
     sendResponse(res, {
@@ -52,6 +54,9 @@ export const getSingleStudentPaymentControllerById = catchAsync(async (req, res)
         where: {
             id,
         },
+        include: {
+            Payment: true,
+        }
     });
 
     sendResponse(res, {
@@ -62,62 +67,33 @@ export const getSingleStudentPaymentControllerById = catchAsync(async (req, res)
     });
 });
 
-// export const deleteStudentController = catchAsync(async (req, res) => {
-//   const { id } = req.params;
+export const updateStudentPaymentController = catchAsync(async (req, res) => {
+  const { id } = req.params;
+  const updateData = req.body;
 
-//   // Check if the student exists
-//   const existingStudent = await prisma.student.findUnique({
-//     where: { id },
-//   });
+  // Check if the payment exists
+  const existingPayment = await prisma.payment.findUnique({
+    where: { id },
+  });
 
-//   if (!existingStudent) {
-//     return sendResponse(res, {
-//       statusCode: 404,
-//       success: false,
-//       message: "student not found",
-//     });
-//   }
+  if (!existingPayment) {
+    return sendResponse(res, {
+      statusCode: 404,
+      success: false,
+      message: "Payment not found",
+    });
+  }
 
-//   // Delete the student
-//   const result = await prisma.student.delete({
-//     where: { id },
-//   });
+  // Update payment with partial data
+  const updatedPayment = await prisma.payment.update({
+    where: { id },
+    data: updateData,
+  });
 
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: "student deleted successfully",
-//     data: result,
-//   });
-// });
-
-// export const updateStudentController = catchAsync(async (req, res) => {
-//   const { id } = req.params;
-//   const updateData = req.body;
-
-//   // Check if the vacation exists
-//   const existingStudent = await prisma.student.findUnique({
-//     where: { id },
-//   });
-
-//   if (!existingStudent) {
-//     return sendResponse(res, {
-//       statusCode: 404,
-//       success: false,
-//       message: "student not found",
-//     });
-//   }
-
-//   // Update vacation with partial data
-//   const updatedStudent = await prisma.student.update({
-//     where: { id },
-//     data: updateData,
-//   });
-
-//   sendResponse(res, {
-//     statusCode: 200,
-//     success: true,
-//     message: "student updated successfully",
-//     data: updatedStudent,
-//   });
-// });
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Payment updated successfully",
+    data: updatedPayment,
+  });
+});

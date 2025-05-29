@@ -106,6 +106,7 @@ export const getAllStudentController = catchAsync(async (req, res) => {
     .include({
       Batch: true,
       Class: true,
+      Payment: true,
     })
     .execute();
 

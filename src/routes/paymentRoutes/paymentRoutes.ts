@@ -1,13 +1,4 @@
-import {
-  createBatchController,
-  deleteBatchController,
-  getAllBatchController,
-  getBatchControllerById,
-  getBatchInfoControllerById,
-  updateBatchController,
-} from "@/controllers/BatchController/batchController";
-import { getAllStudentPaymentController, getSingleStudentPaymentControllerById, paymentStudentController } from "@/controllers/payment/paymentController";
-import auth from "@/middleware/auth";
+import { getAllStudentPaymentController, getSingleStudentPaymentControllerById, paymentStudentController, updateStudentPaymentController } from "@/controllers/payment/paymentController";
 
 import { Router } from "express";
 
@@ -17,8 +8,6 @@ const paymentRouts = Router();
 paymentRouts.post("/", paymentStudentController);
 paymentRouts.get("/", getAllStudentPaymentController);
 paymentRouts.get("/:id", getSingleStudentPaymentControllerById);
-// paymentRouts.get("/batch-info/:id", getBatchInfoControllerById);
-// paymentRouts.patch("/:id", updateBatchController);
-// paymentRouts.delete("/:id", deleteBatchController);
+paymentRouts.patch("/:id", updateStudentPaymentController);
 
 export default paymentRouts;
