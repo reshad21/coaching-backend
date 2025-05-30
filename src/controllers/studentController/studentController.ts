@@ -6,6 +6,7 @@ import AppError from "@/errors/AppError";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
 import uploadImage from "@/utils/uploadImage";
+import { deletePrevFile } from "@/utils/deletePrevFile";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {
@@ -167,31 +168,35 @@ export const deleteStudentController = catchAsync(async (req, res) => {
 
 export const updateStudentController = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const updateData = req.body;
+  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+  const data = req.body;
 
-  // Check if the vacation exists
   const existingStudent = await prisma.student.findUnique({
     where: { id },
   });
 
   if (!existingStudent) {
-    return sendResponse(res, {
-      statusCode: 404,
-      success: false,
-      message: "student not found",
-    });
+    throw new AppError(400, "Student not found");
   }
 
-  // Update vacation with partial data
+  let imageUrl: string | undefined;
+  if (files?.image && files.image.length > 0) {
+    imageUrl = await uploadImage(files.image[0]);
+    deletePrevFile(existingStudent?.image as string);
+  }
+
   const updatedStudent = await prisma.student.update({
     where: { id },
-    data: updateData,
+    data: {
+      ...data,
+      image: imageUrl ?? undefined,
+    },
   });
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "student updated successfully",
+    message: "Student updated successfully",
     data: updatedStudent,
   });
 });

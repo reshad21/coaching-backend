@@ -98,6 +98,7 @@ CREATE TABLE `Payment` (
 -- CreateTable
 CREATE TABLE `CoachingCost` (
     `id` VARCHAR(191) NOT NULL,
+    `month` VARCHAR(191) NOT NULL,
     `instructorSalary` DOUBLE NOT NULL,
     `materialCost` DOUBLE NOT NULL DEFAULT 0,
     `rentAndUtilities` DOUBLE NOT NULL DEFAULT 0,
