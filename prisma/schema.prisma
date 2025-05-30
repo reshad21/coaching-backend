@@ -93,3 +93,19 @@ model Payment {
   studentId String?
   Student   Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
+
+model CoachingCost {
+  id                String   @id @default(uuid())
+  instructorSalary  Float
+  materialCost      Float    @default(0)
+  rentAndUtilities  Float    @default(0)
+  marketingCost     Float    @default(0)
+  otherExpenses     Float    @default(0)
+
+  totalCost         Float
+  totalRevenue      Float
+  profit            Float
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}

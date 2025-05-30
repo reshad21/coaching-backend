@@ -6,6 +6,7 @@ import studentRouts from "./studentRoutes/studentRoutes";
 import authRouts from "./auth.rout";
 import bulkSmsRouts from "./bulkSma/bulkSma.rout";
 import paymentRouts from "./paymentRoutes/paymentRoutes";
+import costRouts from "./costRoutes/costRoutes";
 
 const protectedRoutes = [
   { path: "/login", route: authRouts },
@@ -14,6 +15,7 @@ const protectedRoutes = [
   { path: "/batch", route: batchRouts },
   { path: "/student", route: studentRouts },
   { path: "/payment", route: paymentRouts },
+  { path: "/cost", route: costRouts },
   { path: "/bulk", route: bulkSmsRouts },
 ];
 

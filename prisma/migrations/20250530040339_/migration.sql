@@ -95,6 +95,23 @@ CREATE TABLE `Payment` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `CoachingCost` (
+    `id` VARCHAR(191) NOT NULL,
+    `instructorSalary` DOUBLE NOT NULL,
+    `materialCost` DOUBLE NOT NULL DEFAULT 0,
+    `rentAndUtilities` DOUBLE NOT NULL DEFAULT 0,
+    `marketingCost` DOUBLE NOT NULL DEFAULT 0,
+    `otherExpenses` DOUBLE NOT NULL DEFAULT 0,
+    `totalCost` DOUBLE NOT NULL,
+    `totalRevenue` DOUBLE NOT NULL,
+    `profit` DOUBLE NOT NULL,
+    `createdAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    `updatedAt` DATETIME(3) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Batch` ADD CONSTRAINT `Batch_classId_fkey` FOREIGN KEY (`classId`) REFERENCES `Class`(`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
