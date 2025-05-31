@@ -98,12 +98,12 @@ CREATE TABLE `Payment` (
 -- CreateTable
 CREATE TABLE `CoachingCost` (
     `id` VARCHAR(191) NOT NULL,
-    `month` VARCHAR(191) NOT NULL,
-    `instructorSalary` DOUBLE NOT NULL,
-    `materialCost` DOUBLE NOT NULL DEFAULT 0,
-    `rentAndUtilities` DOUBLE NOT NULL DEFAULT 0,
-    `marketingCost` DOUBLE NOT NULL DEFAULT 0,
-    `otherExpenses` DOUBLE NOT NULL DEFAULT 0,
+    `month` VARCHAR(191) NULL,
+    `instructorSalary` DOUBLE NULL,
+    `materialCost` DOUBLE NULL DEFAULT 0,
+    `rentAndUtilities` DOUBLE NULL DEFAULT 0,
+    `marketingCost` DOUBLE NULL DEFAULT 0,
+    `otherExpenses` DOUBLE NULL DEFAULT 0,
     `totalCost` DOUBLE NOT NULL,
     `totalRevenue` DOUBLE NOT NULL,
     `profit` DOUBLE NOT NULL,

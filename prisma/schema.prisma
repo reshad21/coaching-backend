@@ -96,12 +96,12 @@ model Payment {
 
 model CoachingCost {
   id               String @id @default(uuid())
-  month            String
-  instructorSalary Float
-  materialCost     Float  @default(0)
-  rentAndUtilities Float  @default(0)
-  marketingCost    Float  @default(0)
-  otherExpenses    Float  @default(0)
+  month            String?
+  instructorSalary Float?
+  materialCost     Float?  @default(0)
+  rentAndUtilities Float?  @default(0)
+  marketingCost    Float?  @default(0)
+  otherExpenses    Float?  @default(0)
 
   totalCost    Float
   totalRevenue Float
