@@ -6,9 +6,10 @@ import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
 
 
+
 export const CreateAcademicCostController = catchAsync(async (req, res) => {
   const {
-    month, // <-- Include month from req.body
+    month,
     instructorSalary,
     materialCost,
     rentAndUtilities,
@@ -16,6 +17,7 @@ export const CreateAcademicCostController = catchAsync(async (req, res) => {
     otherExpenses = 0,
   } = req.body;
 
+  // Validate month
   if (!month) {
     return sendResponse(res, {
       statusCode: 400,
@@ -24,60 +26,91 @@ export const CreateAcademicCostController = catchAsync(async (req, res) => {
     });
   }
 
-  // Step 1: Calculate total cost
-  const totalCost =
-    instructorSalary +
-    materialCost +
-    rentAndUtilities +
-    marketingCost +
-    otherExpenses;
+  // Step 1: Safely parse all cost values
+  const salary = Number(instructorSalary) || 0;
+  const materials = Number(materialCost) || 0;
+  const rent = Number(rentAndUtilities) || 0;
+  const marketing = Number(marketingCost) || 0;
+  const others = Number(otherExpenses) || 0;
 
-  // Step 2: Count students
+  // Step 2: Calculate total cost
+  const totalCost = salary + materials + rent + marketing + others;
+
+  // Step 3: Count students (if needed in the future)
   const numberOfStudents = await prisma.student.count();
 
-  // Step 3: Sum admissionFees from Student model
+  // Step 4: Sum admissionFees from Student model
   const studentFees = await prisma.student.aggregate({
     _sum: {
       admissionFees: true,
     },
   });
-  const totalAdmissionFees = studentFees._sum.admissionFees || 0;
+  const totalAdmissionFees = Number(studentFees._sum.admissionFees) || 0;
 
-  // Step 4: Sum payments from Payment model
+  // Step 5: Sum payments from Payment model
   const payments = await prisma.payment.aggregate({
     _sum: {
       amount: true,
     },
   });
-  const totalPayments = payments._sum.amount || 0;
+  const totalPayments = Number(payments._sum.amount) || 0;
 
-  // Step 5: Calculate total revenue and profit
+  // Step 6: Calculate total revenue and profit
   const totalRevenue = totalAdmissionFees + totalPayments;
   const profit = totalRevenue - totalCost;
 
-  // Step 6: Save academic cost data
-  const result = await prisma.coachingCost.create({
-    data: {
-      month, // ✅ Required field added here
-      instructorSalary,
-      materialCost,
-      rentAndUtilities,
-      marketingCost,
-      otherExpenses,
-      totalCost,
-      totalRevenue,
-      profit,
-    },
+  // Step 7: Check for existing cost record for the month
+  const existingCost = await prisma.coachingCost.findFirst({
+    where: { month },
   });
 
-  // Step 7: Send response
+  let result;
+
+  if (existingCost) {
+    // Update existing cost record
+    result = await prisma.coachingCost.update({
+      where: { id: existingCost.id },
+      data: {
+        instructorSalary: salary,
+        materialCost: materials,
+        rentAndUtilities: rent,
+        marketingCost: marketing,
+        otherExpenses: others,
+        totalCost,
+        totalRevenue,
+        profit,
+      },
+    });
+  } else {
+    // Create new cost record
+    result = await prisma.coachingCost.create({
+      data: {
+        month,
+        instructorSalary: salary,
+        materialCost: materials,
+        rentAndUtilities: rent,
+        marketingCost: marketing,
+        otherExpenses: others,
+        totalCost,
+        totalRevenue,
+        profit,
+      },
+    });
+  }
+
+  // Step 8: Send response
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Academic cost calculated and saved successfully",
+    message: existingCost
+      ? "Academic cost updated successfully"
+      : "Academic cost created successfully",
     data: result,
   });
 });
+
+
+
 
 
 
