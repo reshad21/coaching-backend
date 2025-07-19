@@ -5,8 +5,6 @@ import { QueryBuilder } from "@/builders/builders";
 import AppError from "@/errors/AppError";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import uploadImage from "@/utils/uploadImage";
-import { deletePrevFile } from "@/utils/deletePrevFile";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {
@@ -14,19 +12,13 @@ export const createStudentController = catchAsync(async (req, res) => {
     classId,
     batchId,
     shiftId,
+    image,
     admissionFees,
     ...restBody
   } = req.body;
 
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
 
-  if (!files.image || files.image.length === 0) {
-    throw new AppError(400, "No profile image uploaded");
-  }
 
-  const imageUrl = await uploadImage(files.image[0]);
-
-  // Generate Student ID (e.g., COACH-202504-0001)
   const currentYearMonth = new Date()
     .toISOString()
     .slice(0, 7)
@@ -73,7 +65,7 @@ export const createStudentController = catchAsync(async (req, res) => {
   const newStudent = await prisma.student.create({
     data: {
       studentId,
-      image: imageUrl,
+      image,
       dateOfBirth: new Date(dateOfBirth),
       batchName: findBatch?.batchName,
       className: findclass?.className,
@@ -168,7 +160,6 @@ export const deleteStudentController = catchAsync(async (req, res) => {
 
 export const updateStudentController = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const files = req.files as { [fieldname: string]: Express.Multer.File[] };
   const data = req.body;
 
   const existingStudent = await prisma.student.findUnique({
@@ -179,17 +170,10 @@ export const updateStudentController = catchAsync(async (req, res) => {
     throw new AppError(400, "Student not found");
   }
 
-  let imageUrl: string | undefined;
-  if (files?.image && files.image.length > 0) {
-    imageUrl = await uploadImage(files.image[0]);
-    deletePrevFile(existingStudent?.image as string);
-  }
-
   const updatedStudent = await prisma.student.update({
     where: { id },
     data: {
       ...data,
-      image: imageUrl ?? undefined,
     },
   });
 
