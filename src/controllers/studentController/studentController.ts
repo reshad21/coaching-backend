@@ -8,16 +8,28 @@ import sendResponse from "@/utils/sendResponse";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {
+    firstName,
+    lastName,
+    phone,
+    fatherName,
+    motherName,
+    religion,
+    schoolName,
+    address,
+    gender,
     classId,
     batchId,
     shiftId,
     image,
     admissionFees,
-    ...restBody
   } = req.body;
 
-  // console.log("backend code==>", dateOfBirth);
+  // Validate required fields
+  if (!firstName || !lastName || !phone) {
+    throw new AppError(400, "firstName, lastName, and phone are required");
+  }
 
+  // Generate studentId
   const currentYearMonth = new Date()
     .toISOString()
     .slice(0, 7)
@@ -37,7 +49,7 @@ export const createStudentController = catchAsync(async (req, res) => {
 
   const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
 
-  // Fetch batch name using batchId
+  // Fetch related names for batch, class, shift
   const findBatch = await prisma.batch.findFirst({
     where: { id: batchId },
   });
@@ -45,7 +57,6 @@ export const createStudentController = catchAsync(async (req, res) => {
     throw new AppError(404, "Batch not found");
   }
 
-  // Fetch class name using classId
   const findclass = await prisma.class.findFirst({
     where: { id: classId },
   });
@@ -53,7 +64,6 @@ export const createStudentController = catchAsync(async (req, res) => {
     throw new AppError(404, "Class not found");
   }
 
-  // Fetch shift name using shiftId
   const findShift = await prisma.shift.findFirst({
     where: { id: shiftId },
   });
@@ -61,19 +71,27 @@ export const createStudentController = catchAsync(async (req, res) => {
     throw new AppError(404, "Shift not found");
   }
 
+  // Final student creation
   const newStudent = await prisma.student.create({
     data: {
       studentId,
-      image,
-      // dateOfBirth: new Date(dateOfBirth),
-      batchName: findBatch?.batchName,
-      className: findclass?.className,
-      shiftName: findShift?.shiftName,
-      admissionFees: Number(admissionFees), 
+      firstName,
+      lastName,
+      phone,
+      fatherName: fatherName || null,
+      motherName: motherName || null,
+      religion: religion || null,
+      schoolName: schoolName || null,
+      address: address || null,
+      gender: gender || null,
+      image: image || null,
+      admissionFees: isNaN(Number(admissionFees)) ? null : Number(admissionFees),
       batchId,
       classId,
       shiftId,
-      ...restBody,
+      batchName: findBatch?.batchName,
+      className: findclass?.className,
+      shiftName: findShift?.shiftName,
     },
   });
 
@@ -84,8 +102,6 @@ export const createStudentController = catchAsync(async (req, res) => {
     data: newStudent,
   });
 });
-
-
 export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
