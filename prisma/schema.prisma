@@ -58,14 +58,14 @@ model Student {
   id            String    @id @default(uuid())
   studentId     String    @unique
   firstName     String
-  lastName      String?
+  lastName      String
   fatherName    String?
   motherName    String?
-  dateOfBirth   DateTime
+  dateOfBirth   DateTime?
   religion      String?
   schoolName    String?
   phone         String
-  admissionFees Int
+  admissionFees Int?
   address       String?
   image         String?
   gender        String?
