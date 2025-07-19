@@ -61,7 +61,7 @@ model Student {
   lastName      String
   fatherName    String?
   motherName    String?
-  dateOfBirth   DateTime?
+  // dateOfBirth   DateTime?
   religion      String?
   schoolName    String?
   phone         String
@@ -71,7 +71,7 @@ model Student {
   gender        String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  batchName     String? //it will place by backend when student create
+  batchName     String? 
   className     String?
   shiftName     String?
   Payment       Payment[]

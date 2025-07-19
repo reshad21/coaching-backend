@@ -1,14 +1,11 @@
 
 import { createStudentController, deleteStudentController, getAllStudentController, getStudentControllerById, updateStudentController } from "@/controllers/studentController/studentController";
-import { createStudentValidation } from "@/controllers/studentController/studentValidation";
-import validationRequest from "@/errors/validationRequest";
 import { Router } from "express";
 
 const studentRouts = Router();
 
 
-studentRouts.post("/", validationRequest(createStudentValidation), createStudentController);
-
+studentRouts.post("/", createStudentController);
 studentRouts.get("/", getAllStudentController);
 studentRouts.get("/:id", getStudentControllerById);
 studentRouts.patch("/:id", updateStudentController);

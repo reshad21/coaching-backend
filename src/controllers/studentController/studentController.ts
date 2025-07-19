@@ -8,7 +8,6 @@ import sendResponse from "@/utils/sendResponse";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {
-    
     classId,
     batchId,
     shiftId,
@@ -70,7 +69,7 @@ export const createStudentController = catchAsync(async (req, res) => {
       batchName: findBatch?.batchName,
       className: findclass?.className,
       shiftName: findShift?.shiftName,
-      admissionFees: Number(admissionFees), // ✅ Convert to number
+      admissionFees: Number(admissionFees), 
       batchId,
       classId,
       shiftId,
