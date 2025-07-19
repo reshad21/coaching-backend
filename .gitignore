@@ -1,10 +1,4 @@
-node_modules/
-.env
-dist/
 
-
-# Build
-build/
 
 # Unit Test
 # coverage/
@@ -17,3 +11,11 @@ test
 public/
 
 
+.vercel
+node_modules/
+.env
+dist/
+
+
+# Build
+build/
