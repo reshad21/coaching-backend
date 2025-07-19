@@ -8,7 +8,7 @@ import sendResponse from "@/utils/sendResponse";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {
-    dateOfBirth,
+    
     classId,
     batchId,
     shiftId,
@@ -17,7 +17,7 @@ export const createStudentController = catchAsync(async (req, res) => {
     ...restBody
   } = req.body;
 
-
+  // console.log("backend code==>", dateOfBirth);
 
   const currentYearMonth = new Date()
     .toISOString()
@@ -66,7 +66,7 @@ export const createStudentController = catchAsync(async (req, res) => {
     data: {
       studentId,
       image,
-      dateOfBirth: new Date(dateOfBirth),
+      // dateOfBirth: new Date(dateOfBirth),
       batchName: findBatch?.batchName,
       className: findclass?.className,
       shiftName: findShift?.shiftName,
