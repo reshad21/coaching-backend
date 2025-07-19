@@ -1,35 +1,27 @@
 import { PrismaClient } from "@prisma/client";
-import { role } from "./const";
-import { createAdminUser } from "./createAdmin";
+import bcryptjs from "bcryptjs";
 const prisma: PrismaClient = new PrismaClient();
 
-
-
-export const seedAdminUser = async () => {
-  const isRoleExists = await prisma.role.findFirst({
-    where: {
-      id: role?.id,
-    },
-  });
-
-  if (!isRoleExists) {
-    await prisma.role.create({
-      data: {
-        id: role?.id,
-        name: role?.name,
-        feature: {
-          create: role?.feature?.map((data: any) => ({
-            name: data?.name,
-          })),
-        },
-      },
-      include: {
-        feature: true,
-        adminUser: true,
+export const seedUser = async () => {
+    const isRoleExists = await prisma.admin.findFirst({
+      where: {
+        id: "admin4171-b47cl-h4db-ma6eo-kd-2b9922b4",
       },
     });
-    
-  }
-  createAdminUser(role?.id)
-};
-
+  
+    if (!isRoleExists) {
+      
+    const password = await bcryptjs.hash("coaching.managment@gmail.com", 10);
+      await prisma.admin.create({
+        data: {
+          id: "admin4171-b47cl-h4db-ma6eo-kd-2b9922b4",
+          name: "Supper Admin",
+          email:"coaching.managment@gmail.com",
+          password:password,
+          phone:"017"
+        }
+      });
+      console.log("admin is created");
+      
+    }
+  };

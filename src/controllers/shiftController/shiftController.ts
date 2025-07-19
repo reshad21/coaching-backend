@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+import { QueryBuilder } from "@/builders/builders";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import { QueryBuilder } from "@/builders/builders";
 
 
 export const createShiftController = catchAsync(async (req, res) => {
@@ -51,6 +51,42 @@ export const getAllShiftController = catchAsync(async (req, res) => {
     statusCode: 200,
     success: true,
     message: "Get all shift Successfully",
+    data: result,
+  });
+});
+
+// This controller retrieves all shifts and calculates the percentage of students in each shift
+// It returns an array of strings in the format "shiftName percentage%"
+export const getAllShiftStudentController = catchAsync(async (req, res) => {
+  const shifts = await prisma.shift.findMany({
+    select: {
+      shiftName: true,
+      Student: {
+        select: { id: true } // only need id for count
+      }
+    },
+  });
+
+  // Total students count across all shifts
+  const totalStudents = shifts.reduce(
+    (sum, shift) => sum + shift.Student.length,
+    0
+  );
+
+  // Prepare result array with "shiftName percentage%"
+  const result = shifts.map((shift) => {
+    const count = shift.Student.length;
+    const percentage = totalStudents
+      ? ((count / totalStudents) * 100).toFixed(0)
+      : "0";
+
+    return `${shift.shiftName} ${percentage}%`;
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Get all shift student percentages successfully",
     data: result,
   });
 });
@@ -130,4 +166,7 @@ export const updateShiftController = catchAsync(async (req, res) => {
     message: "shift updated successfully",
     data: updatedShift,
   });
+
+
+
 });

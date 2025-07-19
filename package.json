@@ -6,9 +6,11 @@
   "main": "server.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=development tsx watch src/server.ts",
-    "build": "rm -rf dist && tsc -p .",
-    "start": "cross-env NODE_ENV=production node dist/server.js"
+    "dev": "cross-env NODE_ENV=development tsx src/server.ts",
+    "build": "tsup",
+    "start": "cross-env NODE_ENV=production node build/server.js",
+     "postinstall": "prisma generate"
+
   },
   "keywords": [],
   "author": "",
@@ -26,11 +28,12 @@
     "eslint": "^9.19.0",
     "eslint-plugin-node": "^11.1.0",
     "prettier": "^3.4.2",
+    "tsup": "^8.5.0",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },
   "dependencies": {
-    "@prisma/client": "^6.3.0",
+    "@prisma/client": "^6.11.1",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -39,7 +42,7 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^1.4.5-lts.1",
     "path": "^0.12.7",
-    "prisma": "^6.3.0",
+    "prisma": "^6.11.1",
     "sharp": "^0.33.5",
     "uuid": "^11.1.0",
     "zod": "^3.24.2"

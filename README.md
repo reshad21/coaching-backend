@@ -1,6 +1,6 @@
-﻿# GG Medical - Express Backend
+﻿# coaching-management  - Express Backend
 
-This is the backend for the GG Medical project, built using **Express**, **TypeScript**, and **Prisma**. The project implements GraphQL for the API layer and connects to a database using Prisma. It includes basic features such as environment configuration, database migrations, and seeding.
+This is the backend for the coaching-management project, built using **Express**, **TypeScript**, and **Prisma**. The project implements GraphQL for the API layer and connects to a database using Prisma. It includes basic features such as environment configuration, database migrations, and seeding.
 
 ## Table of Contents
 
@@ -17,13 +17,13 @@ Follow the steps below to set up the project on your local machine:
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/mntechdigital/GMC_Portal_-Backend.git
+    git clone https://github.com/mntechdigital/coaching-management _-Backend.git
     ```
 
 2. **Navigate into the project directory**:
 
     ```bash
-    cd GMC_Portal_-Backend
+    cd coaching-management _-Backend
     ```
 
 3. **Install the required dependencies**:

@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -14,9 +14,19 @@ model Test {
   updatedAt DateTime @updatedAt
 }
 
+model Admin {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model Batch {
   id        String    @id @default(uuid())
-  batchName String?
+  batchName String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Class     Class?    @relation(fields: [classId], references: [id])
@@ -27,54 +37,76 @@ model Batch {
 }
 
 model Class {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   className String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Batch     Batch[]
+  Student   Student[]
 }
 
 model Shift {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   shiftName String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   Batch     Batch[]
+  Student   Student[]
 }
 
 model Student {
-  id          String         @id @default(uuid())
-  studentId   String         @unique
-  firstName   String
-  lastName    String?
-  fatherName  String?
-  motherName  String?
-  dateOfBirth DateTime
-  religion    String?
-  phone       String
-  email       String
-  address     String?
-  image       String?
-  gender      String?
-  class       String?
-  Payment     PaymentMONTHLY
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  Batch       Batch?         @relation(fields: [batchId], references: [id])
-  batchId     String?
+  id            String    @id @default(uuid())
+  studentId     String    @unique
+  firstName     String
+  lastName      String
+  fatherName    String?
+  motherName    String?
+  // dateOfBirth   DateTime?
+  religion      String?
+  schoolName    String?
+  phone         String
+  admissionFees Int?
+  address       String?
+  image         String?
+  gender        String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  batchName     String? 
+  className     String?
+  shiftName     String?
+  Payment       Payment[]
+  Class         Class?    @relation(fields: [classId], references: [id])
+  classId       String?
+  Batch         Batch?    @relation(fields: [batchId], references: [id])
+  batchId       String?
+  Shift         Shift?    @relation(fields: [shiftId], references: [id])
+  shiftId       String?
 }
 
-enum PaymentMONTHLY {
-  january
-  february
-  march
-  april
-  may
-  june
-  july
-  august
-  september
-  october
-  november
-  december
+model Payment {
+  id        String   @id @default(uuid())
+  title     String
+  amount    Int
+  month     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  studentId String?
+  Student   Student? @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model CoachingCost {
+  id               String @id @default(uuid())
+  month            String?
+  instructorSalary Float?
+  materialCost     Float?  @default(0)
+  rentAndUtilities Float?  @default(0)
+  marketingCost    Float?  @default(0)
+  otherExpenses    Float?  @default(0)
+
+  totalCost    Float
+  totalRevenue Float
+  profit       Float
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

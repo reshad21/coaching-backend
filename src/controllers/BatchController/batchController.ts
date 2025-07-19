@@ -1,13 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+import { QueryBuilder } from "@/builders/builders";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import { QueryBuilder } from "@/builders/builders";
 
 export const createBatchController = catchAsync(async (req, res) => {
-  // const { batchName } = req?.body;
-   const data = req.body;
+  const data = req.body;
 
   const findBatch = await prisma.batch.findFirst({
     where: {
@@ -17,24 +16,23 @@ export const createBatchController = catchAsync(async (req, res) => {
   if (findBatch) {
     return res.status(400).json({
       success: false,
-      message: "batch already exists !!",
+      message: "Batch already exists !!",
     });
   }
 
   const result = await prisma.batch.create({
-    data
+    data,
   });
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "batch Create Successfully",
+    message: "Batch Create Successfully",
     data: result,
   });
 });
 
 export const getAllBatchController = catchAsync(async (req, res) => {
-  // const result = await prisma.batch.findMany();
 
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
@@ -42,6 +40,19 @@ export const getAllBatchController = catchAsync(async (req, res) => {
     .sort()
     .paginate()
     .fields()
+    .include({
+      Class: {
+        select: {
+          className: true,
+        },
+      },
+      Shift: {
+        select: {
+          shiftName: true,
+        },
+      },
+      students: true,
+    })
     .execute();
 
   sendResponse(res, {
@@ -65,6 +76,36 @@ export const getBatchControllerById = catchAsync(async (req, res) => {
     statusCode: 200,
     success: true,
     message: "Get single batch successful",
+    data: result,
+  });
+});
+export const getBatchInfoControllerById = catchAsync(async (req, res) => {
+  const { id } = req?.params;
+
+  const result = await prisma.batch.findFirst({
+    where: {
+      id,
+    },
+    select: {
+      Class: {
+        select: {
+          className: true,
+          id: true
+        }
+      },
+      Shift: {
+        select: {
+          shiftName: true,
+          id: true
+        }
+      }
+    }
+  });
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Get single batch info successful",
     data: result,
   });
 });

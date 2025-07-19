@@ -1,70 +1,47 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
+import { QueryBuilder } from "@/builders/builders";
+import AppError from "@/errors/AppError";
 import catchAsync from "@/utils/catchAsync";
 import sendResponse from "@/utils/sendResponse";
-import { QueryBuilder } from "@/builders/builders";
-
-/* export const createStudentController = catchAsync(async (req, res) => {
-  // const { studentName } = req?.body;
-  const data = req.body;
-
-  const findStudent = await prisma.student.findFirst({
-    where: {
-      // firstName:data.firstName,
-      // dateOfBirth: data.dateOfBirth
-      studentId: data.studentId,
-    },
-  });
-  if (findStudent) {
-    return res.status(400).json({
-      success: false,
-      message: "student already exists !!",
-    });
-  }
-
-  const result = await prisma.student.create({
-    data,
-  });
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "student Create Successfully",
-    data: result,
-  });
-}); */
 
 export const createStudentController = catchAsync(async (req, res) => {
-  const { firstName, lastName, phone, dateOfBirth } = req.body;
+  const {
+    firstName,
+    lastName,
+    phone,
+    fatherName,
+    motherName,
+    religion,
+    schoolName,
+    address,
+    gender,
+    classId,
+    batchId,
+    shiftId,
+    image,
+    admissionFees,
+  } = req.body;
 
-  // Check if student with the same name, phone, and DOB exists
-  // const existingStudent = await prisma.student.findFirst({
-  //   where: {
-  //      firstName,
-  //      lastName,
-  //      phone,
-  //      dateOfBirth: new Date(dateOfBirth)
-  //   }
-  // });
+  // Validate required fields
+  if (!firstName || !lastName || !phone) {
+    throw new AppError(400, "firstName, lastName, and phone are required");
+  }
 
-  // if (existingStudent) {
-  //   return res.status(400).json({
-  //     success: false,
-  //     message: "Student already exists!"
-  //   });
-  // }
-
-  // Generate Student ID (e.g., COACH-202503-0001)
-  const currentYearMonth = new Date().toISOString().slice(0, 7).replace("-", ""); // YYYYMM
+  // Generate studentId
+  const currentYearMonth = new Date()
+    .toISOString()
+    .slice(0, 7)
+    .replace("-", "");
   const lastStudent = await prisma.student.findFirst({
     where: {
-      studentId: { startsWith: `COACH-${currentYearMonth}` }
+      studentId: { startsWith: `COACH-${currentYearMonth}` },
     },
-    orderBy: { studentId: "desc" }
+    orderBy: { studentId: "desc" },
   });
 
-  let nextNumber = "0001"; // Default if no previous student
+  let nextNumber = "0001";
   if (lastStudent) {
     const lastNumber = parseInt(lastStudent.studentId.slice(-4), 10);
     nextNumber = String(lastNumber + 1).padStart(4, "0");
@@ -72,39 +49,81 @@ export const createStudentController = catchAsync(async (req, res) => {
 
   const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
 
-  // Create the new student with generated studentId
-  const student = await prisma.student.create({
+  // Fetch related names for batch, class, shift
+  const findBatch = await prisma.batch.findFirst({
+    where: { id: batchId },
+  });
+  if (!findBatch) {
+    throw new AppError(404, "Batch not found");
+  }
+
+  const findclass = await prisma.class.findFirst({
+    where: { id: classId },
+  });
+  if (!findclass) {
+    throw new AppError(404, "Class not found");
+  }
+
+  const findShift = await prisma.shift.findFirst({
+    where: { id: shiftId },
+  });
+  if (!findShift) {
+    throw new AppError(404, "Shift not found");
+  }
+
+  // Final student creation
+  const newStudent = await prisma.student.create({
     data: {
       studentId,
-      ...req.body
-    }
+      firstName,
+      lastName,
+      phone,
+      fatherName: fatherName || null,
+      motherName: motherName || null,
+      religion: religion || null,
+      schoolName: schoolName || null,
+      address: address || null,
+      gender: gender || null,
+      image: image || null,
+      admissionFees: isNaN(Number(admissionFees)) ? null : Number(admissionFees),
+      batchId,
+      classId,
+      shiftId,
+      batchName: findBatch?.batchName,
+      className: findclass?.className,
+      shiftName: findShift?.shiftName,
+    },
   });
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Student created successfully",
-    data: student
+    data: newStudent,
   });
 });
-
-
 export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
   const result = await new QueryBuilder("student", req.query)
-    .search(["firstName", "lastName"])
+    .search(["firstName", "lastName", "phone", "schoolName", "studentId"])
     .filter()
     .sort()
     .paginate()
     .fields()
+    .include({
+      Batch: true,
+      Class: true,
+      Payment: true,
+    })
     .execute();
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Get all student Successfully",
-    data: result,
+    meta: result?.meta,
+    data: result?.data ? result?.data : result,
   });
 });
 
@@ -156,31 +175,27 @@ export const deleteStudentController = catchAsync(async (req, res) => {
 
 export const updateStudentController = catchAsync(async (req, res) => {
   const { id } = req.params;
-  const updateData = req.body;
+  const data = req.body;
 
-  // Check if the vacation exists
   const existingStudent = await prisma.student.findUnique({
     where: { id },
   });
 
   if (!existingStudent) {
-    return sendResponse(res, {
-      statusCode: 404,
-      success: false,
-      message: "student not found",
-    });
+    throw new AppError(400, "Student not found");
   }
 
-  // Update vacation with partial data
   const updatedStudent = await prisma.student.update({
     where: { id },
-    data: updateData,
+    data: {
+      ...data,
+    },
   });
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "student updated successfully",
+    message: "Student updated successfully",
     data: updatedStudent,
   });
 });

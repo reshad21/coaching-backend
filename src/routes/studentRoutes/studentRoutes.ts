@@ -12,3 +12,4 @@ studentRouts.patch("/:id", updateStudentController);
 studentRouts.delete("/:id", deleteStudentController);
 
 export default studentRouts;
+
