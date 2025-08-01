@@ -17,7 +17,7 @@ Follow the steps below to set up the project on your local machine:
 1. **Clone the repository**:
 
     ```bash
-    git clone https://github.com/mntechdigital/coaching-management _-Backend.git
+    git clone https://github.com/programmerasif/Coaching_Management_backend.git
     ```
 
 2. **Navigate into the project directory**:
