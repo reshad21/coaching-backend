@@ -20,12 +20,11 @@ export class QueryBuilder<T extends keyof PrismaClient> {
     } as Prisma.Args<PrismaClient[T], "findMany">;
   }
 
-   // Add this new method
+  // Add this new method
   select(fields: Record<string, boolean>) {
     this.options.select = fields;
     return this;
   }
-
 
   addManualFilter(filter: Record<string, any>) {
     this.options.where = {
@@ -39,13 +38,13 @@ export class QueryBuilder<T extends keyof PrismaClient> {
       const searchQueries = Array.isArray(this.query.search)
         ? this.query.search
         : [this.query.search];
-  
+
       const fields = this.query.searchFields
         ? this.query.searchFields.split(",")
         : defaultFields;
-  
+
       if (!fields.length) return this;
-  
+
       const noticeValidEnumValues = ["ONLINE", "GENERAL", "COMMON"];
       const noticeAudienceValidEnumValues = ["TEACHER", "STUDENT", "BOTH"];
       const profExamEnumValues = [
@@ -54,55 +53,63 @@ export class QueryBuilder<T extends keyof PrismaClient> {
         "Third_Prof_Exam",
         "Fourth_Prof_Exam",
       ];
-  
+
       const conditions = searchQueries.map((searchQuery) => ({
         OR: fields
           .map((field: string) => {
             const trimmedQuery = searchQuery.trim();
-  
+
             if (field === "category") {
               return noticeValidEnumValues.includes(trimmedQuery.toUpperCase())
                 ? { [field]: { equals: trimmedQuery.toUpperCase() } }
                 : null;
             }
-  
+
             if (field === "targetedAudience") {
-              return noticeAudienceValidEnumValues.includes(trimmedQuery.toUpperCase())
+              return noticeAudienceValidEnumValues.includes(
+                trimmedQuery.toUpperCase()
+              )
                 ? { [field]: { equals: trimmedQuery.toUpperCase() } }
                 : null;
             }
-  
+
             if (field === "ProfExamNumber") {
               return profExamEnumValues.includes(trimmedQuery)
                 ? { [field]: { equals: trimmedQuery } }
                 : null;
             }
-  
+
             if (field === "batch") {
               // "batch" is a relation, can't apply `contains` directly
               return null;
             }
-  
+
             return {
               [field]: {
                 contains: trimmedQuery,
+                mode: "insensitive", 
               },
             };
           })
           .filter(Boolean), // remove nulls
       }));
-  
+
       (this.options.where as any).AND = conditions;
     }
     return this;
   }
-  
-  
-  
 
   // Filtering
   filter() {
-    const excludedFields = ["search", "sortBy", "order", "page", "limit", "fields", "include"];
+    const excludedFields = [
+      "search",
+      "sortBy",
+      "order",
+      "page",
+      "limit",
+      "fields",
+      "include",
+    ];
     Object.keys(this.query).forEach((key) => {
       if (!excludedFields.includes(key)) {
         (this.options.where as any)[key] = this.query[key];
@@ -156,10 +163,13 @@ export class QueryBuilder<T extends keyof PrismaClient> {
       } catch (error) {
         // If parsing fails, assume comma-separated values and build include object
         const includedRelations = this.query.include.split(",");
-        this.options.include = includedRelations.reduce((acc: Record<string, boolean>, relation: string) => {
-          acc[relation.trim()] = true;
-          return acc;
-        }, {});
+        this.options.include = includedRelations.reduce(
+          (acc: Record<string, boolean>, relation: string) => {
+            acc[relation.trim()] = true;
+            return acc;
+          },
+          {}
+        );
       }
     }
     return this;
@@ -169,18 +179,18 @@ export class QueryBuilder<T extends keyof PrismaClient> {
     const page = parseInt(this.query.page);
     const limit = parseInt(this.query.limit);
     const hasPagination = !isNaN(page) && !isNaN(limit);
-  
+
     if (hasPagination) {
       this.options.take = limit;
       this.options.skip = (page - 1) * limit;
-  
+
       const [data, total] = await Promise.all([
         (this.model as any).findMany(this.options),
         (this.model as any).count({ where: this.options.where }),
       ]);
-  
+
       const totalPages = Math.ceil(total / limit);
-  
+
       return {
         meta: {
           total,
@@ -191,11 +201,10 @@ export class QueryBuilder<T extends keyof PrismaClient> {
         data,
       };
     }
-  
+
     // Remove take/skip if not paginating to avoid Prisma interpreting undefined
     const { take, skip, ...restOptions } = this.options;
-  
+
     return (this.model as any).findMany(restOptions);
   }
-  
 }
