@@ -29,49 +29,30 @@ export const createStudentController = catchAsync(async (req, res) => {
     throw new AppError(400, "firstName, lastName, and phone are required");
   }
 
-  // Generate studentId
-  const currentYearMonth = new Date()
-    .toISOString()
-    .slice(0, 7)
-    .replace("-", "");
+  // Find last student by studentId (descending)
   const lastStudent = await prisma.student.findFirst({
-    where: {
-      studentId: { startsWith: `COACH-${currentYearMonth}` },
-    },
     orderBy: { studentId: "desc" },
   });
 
   let nextNumber = "0001";
   if (lastStudent) {
-    const lastNumber = parseInt(lastStudent.studentId.slice(-4), 10);
+    const lastNumber = parseInt(lastStudent.studentId, 10);
     nextNumber = String(lastNumber + 1).padStart(4, "0");
   }
 
-  const studentId = `COACH-${currentYearMonth}-${nextNumber}`;
+  const studentId = nextNumber;
 
-  // Fetch related names for batch, class, shift
-  const findBatch = await prisma.batch.findFirst({
-    where: { id: batchId },
-  });
-  if (!findBatch) {
-    throw new AppError(404, "Batch not found");
-  }
+  // Fetch related names
+  const findBatch = await prisma.batch.findFirst({ where: { id: batchId } });
+  if (!findBatch) throw new AppError(404, "Batch not found");
 
-  const findclass = await prisma.class.findFirst({
-    where: { id: classId },
-  });
-  if (!findclass) {
-    throw new AppError(404, "Class not found");
-  }
+  const findclass = await prisma.class.findFirst({ where: { id: classId } });
+  if (!findclass) throw new AppError(404, "Class not found");
 
-  const findShift = await prisma.shift.findFirst({
-    where: { id: shiftId },
-  });
-  if (!findShift) {
-    throw new AppError(404, "Shift not found");
-  }
+  const findShift = await prisma.shift.findFirst({ where: { id: shiftId } });
+  if (!findShift) throw new AppError(404, "Shift not found");
 
-  // Final student creation
+  // Create student
   const newStudent = await prisma.student.create({
     data: {
       studentId,
@@ -89,9 +70,9 @@ export const createStudentController = catchAsync(async (req, res) => {
       batchId,
       classId,
       shiftId,
-      batchName: findBatch?.batchName,
-      className: findclass?.className,
-      shiftName: findShift?.shiftName,
+      batchName: findBatch.batchName,
+      className: findclass.className,
+      shiftName: findShift.shiftName,
     },
   });
 
@@ -102,6 +83,9 @@ export const createStudentController = catchAsync(async (req, res) => {
     data: newStudent,
   });
 });
+
+
+
 export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
