@@ -29,7 +29,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
   "https://coachingdevelopfrontend.vercel.app",
-  "https://coaching-management.vercel.app",
   "http://localhost:5173", // Optional: if you want local dev too
 ];
 // CORS configuration
