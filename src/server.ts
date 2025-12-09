@@ -67,7 +67,9 @@ app.use("/api/", mainRouter);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: `Coaching_backend_vercel_server ${port}`,
+    message: `🎯 Coaching Backend Server is running on ${envName} environment (Port: ${port})`,
+    environment: envName,
+    timestamp: new Date().toISOString(),
   });
 });
 
