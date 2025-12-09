@@ -113,9 +113,9 @@ model CoachingCost {
 
 model SiteSetting {
   id        String   @id @default(uuid())
-  brandName String
-  logo      String
-  favicon   String
+  brandName String?
+  logo      String?
+  favicon   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

@@ -7,6 +7,7 @@ import authRouts from "./auth.rout";
 import bulkSmsRouts from "./bulkSma/bulkSma.rout";
 import paymentRouts from "./paymentRoutes/paymentRoutes";
 import costRouts from "./costRoutes/costRoutes";
+import siteSettingRouts from "./siteSettingRoutes/siteSettingRoutes";
 
 const protectedRoutes = [
   { path: "/login", route: authRouts },
@@ -17,6 +18,7 @@ const protectedRoutes = [
   { path: "/payment", route: paymentRouts },
   { path: "/cost", route: costRouts },
   { path: "/bulk", route: bulkSmsRouts },
+  { path: "/site-setting", route: siteSettingRouts },
 ];
 
 const mainRouter = Router();
