@@ -1,11 +1,10 @@
-import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
-import mainRouter from "./routes";
-import notFound from "./utils/notFound";
+import dotenv from "dotenv";
+import express from "express";
 import { globalErrorHandler } from "./middleware/golobalErrorHandler";
-import AppError from "./errors/AppError";
+import mainRouter from "./routes";
 import { seedUser } from "./SeedUser/seedUser";
+import notFound from "./utils/notFound";
 
 
 dotenv.config();
@@ -29,31 +28,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 const allowedOrigins = [
   "https://coachingdevelopfrontend.vercel.app",
+  "https://coachingdevelopfrontend-rkgkw4yhd-reshad21s-projects.vercel.app",
   "http://localhost:5173", // Optional: if you want local dev too
 ];
-// CORS configuration
-// const corsOptions = {
-//   origin: (
-//     origin: string | undefined,
-//     callback: (err: Error | null, allow?: string | boolean) => void
-//   ) => {
-//     if (!origin || corsOrigin.split(",").includes(origin)) {
-//       callback(null, origin);
-//     } else {
-//       callback(new AppError(301, `Origin: ${origin} not allowed by CORS`));
-//     }
-//   },
-//   credentials: true,
-//   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-//   allowedHeaders: ["Content-Type", "Authorization"],
-// };
+
 const corsOptions = {
   origin: function (origin: string | undefined, callback: Function) {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      console.error( origin);
-      callback(new AppError(403, `Origin ${origin} not allowed by CORS`));
+      console.error("Blocked origin:", origin);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
   credentials: true,
@@ -61,6 +46,9 @@ const corsOptions = {
   allowedHeaders: ["Content-Type", "Authorization"],
 };
 app.use(cors(corsOptions));
+
+// Handle preflight requests explicitly
+app.options('*', cors(corsOptions));
 
 app.use("/api/", mainRouter);
 
