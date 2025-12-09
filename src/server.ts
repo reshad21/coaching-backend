@@ -67,7 +67,7 @@ app.use("/api/", mainRouter);
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: `Coaching_Management_backend ${port}`,
+    message: `Coaching_backend_vercel_server ${port}`,
   });
 });
 
