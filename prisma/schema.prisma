@@ -17,7 +17,7 @@ model Test {
 model Admin {
   id        String   @id @default(uuid())
   name      String
-  email     String
+  email     String   @unique
   phone     String
   password  String
   createdAt DateTime @default(now())
@@ -71,7 +71,7 @@ model Student {
   gender        String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  batchName     String? 
+  batchName     String?
   className     String?
   shiftName     String?
   Payment       Payment[]
@@ -95,7 +95,7 @@ model Payment {
 }
 
 model CoachingCost {
-  id               String @id @default(uuid())
+  id               String  @id @default(uuid())
   month            String?
   instructorSalary Float?
   materialCost     Float?  @default(0)

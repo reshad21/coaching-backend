@@ -1,27 +1,46 @@
 import { PrismaClient } from "@prisma/client";
 import bcryptjs from "bcryptjs";
-const prisma: PrismaClient = new PrismaClient();
+
+const prisma = new PrismaClient();
+
+const adminUsers = [
+  {
+    name: "Super Admin",
+    email: "coaching.managment@gmail.com",
+    phone: "01700000001",
+    password: "Admin@123",
+  },
+  {
+    name: "Second Admin",
+    email: "admin2@gmail.com",
+    phone: "01700000002",
+    password: "Admin@123",
+  },
+];
 
 export const seedUser = async () => {
-    const isRoleExists = await prisma.admin.findFirst({
+  for (const admin of adminUsers) {
+    const isExists = await prisma.admin.findUnique({
       where: {
-        id: "admin4171-b47cl-h4db-ma6eo-kd-2b9922b4",
+        email: admin.email,   // ✅ email check
       },
     });
-  
-    if (!isRoleExists) {
-      
-    const password = await bcryptjs.hash("coaching.managment@gmail.com", 10);
+
+    if (!isExists) {
+      const hashPassword = await bcryptjs.hash(admin.password, 10);
+
       await prisma.admin.create({
         data: {
-          id: "admin4171-b47cl-h4db-ma6eo-kd-2b9922b4",
-          name: "Supper Admin",
-          email:"coaching.managment@gmail.com",
-          password:password,
-          phone:"017"
-        }
+          name: admin.name,
+          email: admin.email,
+          phone: admin.phone,
+          password: hashPassword,
+        },
       });
-      console.log("admin is created");
-      
+
+      console.log(`✅ Admin Seeded: ${admin.email}`);
+    } else {
+      console.log(`⚠️ Already Exists: ${admin.email}`);
     }
-  };
+  }
+};
