@@ -1,4 +1,0 @@
--- AlterTable
-ALTER TABLE "SiteSetting" ALTER COLUMN "brandName" DROP NOT NULL,
-ALTER COLUMN "logo" DROP NOT NULL,
-ALTER COLUMN "favicon" DROP NOT NULL;
