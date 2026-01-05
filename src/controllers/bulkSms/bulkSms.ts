@@ -11,13 +11,7 @@ export const bulkController = catchAsync(async (req, res) => {
   const apiKey = process.env.API_KEY;
   const senderId = process.env.SENDER_ID;
 
-  //   const users = await prisma.user.findMany({
-  //     select: { phone: true },
-  //   });
-
-  //   const phoneNumbers = users.map((user) => `880${user.phone}`).join(',');
   const phoneNumbers = "01600416187";
-  // const message = "Hello Sabilar Bhai,This is testing for Bulk Message"
 
   const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
 
