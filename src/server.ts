@@ -6,7 +6,6 @@ import mainRouter from "./routes";
 import { seedUser } from "./SeedUser/seedUser";
 import notFound from "./utils/notFound";
 
-
 dotenv.config();
 const envFile =
   process.env.NODE_ENV === "production"
@@ -19,10 +18,8 @@ const envName =
   process.env.NODE_ENV === "production" ? "production" : "development";
 
 const port = process.env.PORT!;
-const corsOrigin = process.env.CORS_ORIGIN!;
 
 const app = express();
-
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -48,7 +45,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // Handle preflight requests explicitly
-app.options('*', cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 app.use("/api/", mainRouter);
 
@@ -61,13 +58,6 @@ app.get("/", (req, res) => {
   });
 });
 
-// Not Found
-app.use(notFound);
+// Do NOT call app.listen() for Vercel
 
-// Global error handler
-app.use(globalErrorHandler);
-
-app.listen(port, () => {
-  seedUser();
-  console.log(`${envName} Server is running on http://localhost:${port}`);
-});
+export default app;
