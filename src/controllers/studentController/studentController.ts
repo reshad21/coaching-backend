@@ -66,7 +66,9 @@ export const createStudentController = catchAsync(async (req, res) => {
       address: address || null,
       gender: gender || null,
       image: image || null,
-      admissionFees: isNaN(Number(admissionFees)) ? null : Number(admissionFees),
+      admissionFees: isNaN(Number(admissionFees))
+        ? null
+        : Number(admissionFees),
       batchId,
       classId,
       shiftId,
@@ -83,8 +85,6 @@ export const createStudentController = catchAsync(async (req, res) => {
     data: newStudent,
   });
 });
-
-
 
 export const getAllStudentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
@@ -115,16 +115,23 @@ export const getStudentControllerById = catchAsync(async (req, res) => {
   const { id } = req?.params;
 
   const result = await prisma.student.findFirst({
-    where: {
-      id,
-    },
+    where: { id },
+    include: { Batch: true },
   });
+
+  // Attach batchName from related Batch if available
+  const responseData = result
+    ? {
+        ...result,
+        batchName: result.Batch ? result.Batch.batchName : "",
+      }
+    : null;
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
     message: "Get single student successful",
-    data: result,
+    data: responseData,
   });
 });
 
@@ -169,11 +176,20 @@ export const updateStudentController = catchAsync(async (req, res) => {
     throw new AppError(400, "Student not found");
   }
 
+  // Ensure batchId is always overwritten, not appended, and batchName is updated
+  const updatePayload: any = { ...data };
+  if (Object.prototype.hasOwnProperty.call(data, "batchId")) {
+    updatePayload.batchId = data.batchId;
+    // Fetch the new batch name
+    const findBatch = await prisma.batch.findFirst({
+      where: { id: data.batchId },
+    });
+    updatePayload.batchName = findBatch ? findBatch.batchName : "";
+  }
+
   const updatedStudent = await prisma.student.update({
     where: { id },
-    data: {
-      ...data,
-    },
+    data: updatePayload,
   });
 
   sendResponse(res, {
