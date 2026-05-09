@@ -11,48 +11,43 @@ const envFile =
 dotenv.config({ path: envFile });
 
 const envName =
-  process.env.NODE_ENV === "production" ? "production" : "development";
+  process.env.NODE_ENV === "production"
+    ? "production"
+    : "development";
 
 const port = process.env.PORT!;
 
 const app = express();
+
 app.set("trust proxy", 1);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
 const allowedOrigins = [
   "https://coachingdevelopfrontend.vercel.app",
-  "https://coachingdevelopfrontend-rkgkw4yhd-reshad21s-projects.vercel.app",
-  "http://localhost:5173", // Optional: if you want local dev too
+  "http://localhost:5173",
 ];
 
-const corsOptions = {
-  origin: function (origin: string | undefined, callback: Function) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("Blocked origin:", origin);
 
-      // Instead of throwing error
-      callback(null, false);
-    }
-  },
+// HERE WE LOG THE ORIGIN OF EACH INCOMING REQUEST TO HELP DEBUG CORS ISSUES
+app.use((req, res, next) => {
+  console.log(req.headers.origin);
+  next();
+});
 
-  credentials: true,
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+app.options("*", cors());
 
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-  ],
-};
-app.use(cors(corsOptions));
-
-// Handle preflight requests explicitly
-app.options("*", cors(corsOptions));
-
-app.use("/api/", mainRouter);
+app.use("/api", mainRouter);
 
 app.get("/", (req, res) => {
   res.json({
@@ -62,7 +57,5 @@ app.get("/", (req, res) => {
     timestamp: new Date().toISOString(),
   });
 });
-
-// Do NOT call app.listen() for Vercel
 
 export default app;
