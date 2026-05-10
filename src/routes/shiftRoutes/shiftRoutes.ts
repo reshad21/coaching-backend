@@ -1,4 +1,10 @@
-import { createShiftController, deleteShiftController, getAllShiftController, getAllShiftStudentController, getShiftControllerById, updateShiftController } from "@/controllers/shiftController/shiftController";
+import { createShiftController, 
+    deleteShiftController, 
+    getAllShiftController, 
+    getAllShiftStudentController, 
+    getShiftControllerById, 
+    updateShiftController 
+} from "../../controllers/shiftController/shiftController";
 import { Router } from "express";
 
 
