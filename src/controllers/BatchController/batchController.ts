@@ -1,9 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-import { QueryBuilder } from "@/builders/builders";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { QueryBuilder } from "../../builders/builders";
 
 export const createBatchController = catchAsync(async (req, res) => {
   const data = req.body;

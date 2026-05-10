@@ -5,8 +5,8 @@ import {
   getBatchControllerById,
   getBatchInfoControllerById,
   updateBatchController,
-} from "@/controllers/BatchController/batchController";
-import auth from "@/middleware/auth";
+} from "../../controllers/BatchController/batchController";
+import auth from "../../middleware/auth";
 
 import { Router } from "express";
 
