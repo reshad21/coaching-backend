@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
-import AppError from "@/errors/AppError";
-import { generateToken } from "@/utils/jwt";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import AppError from "../../errors/AppError";
+import { generateToken } from "../../utils/jwt";
 import bcryptjs from 'bcryptjs'
 
 export const loginController = catchAsync(async (req, res) => {
