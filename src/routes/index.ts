@@ -16,7 +16,7 @@ const protectedRoutes = [
   { path: "/batch", route: batchRouts },
   { path: "/student", route: studentRouts },
   { path: "/payment", route: paymentRouts },
-  // { path: "/cost", route: costRouts },
+  { path: "/cost", route: costRouts },
   // { path: "/bulk", route: bulkSmsRouts },
   // { path: "/site-setting", route: siteSettingRouts },
 ];
