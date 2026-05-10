@@ -38,7 +38,31 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+      console.log("Origin:", origin);
+
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      // localhost
+      if (origin.includes("localhost")) {
+        return callback(null, true);
+      }
+
+      // allow all vercel domains
+      if (origin.endsWith(".vercel.app")) {
+        return callback(null, true);
+      }
+
+      // manual allow list
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("CORS blocked"));
+    },
+
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
