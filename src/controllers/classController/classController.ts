@@ -1,10 +1,10 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 import exp from "constants";
-import { QueryBuilder } from "@/builders/builders";
+import { QueryBuilder } from "../../builders/builders";
 
 export const createClassController = catchAsync(async (req, res) => {
   const { className } = req?.body;
