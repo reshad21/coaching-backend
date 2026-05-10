@@ -2,11 +2,7 @@ import sharp from "sharp";
 import fs from "fs";
 import path from "path";
 import { Express } from "express";
-import { fileURLToPath } from "url";
 import AppError from "@/errors/AppError";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const uploadFile = async (file: Express.Multer.File): Promise<string> => {
   try {
@@ -42,7 +38,6 @@ const uploadFile = async (file: Express.Multer.File): Promise<string> => {
         .toFile(filePath); // Save image file
 
       fileUrl = `/images/${filename}`; // URL to access the image
-
     } else if (file.mimetype === "application/pdf") {
       // If the file is a PDF, save it in the 'public/file' folder
       const filename = `document-${Date.now()}.pdf`;
@@ -52,7 +47,6 @@ const uploadFile = async (file: Express.Multer.File): Promise<string> => {
       fs.writeFileSync(filePath, file.buffer);
 
       fileUrl = `/file/${filename}`; // URL to access the PDF
-
     } else {
       throw new Error("Unsupported file type");
     }
