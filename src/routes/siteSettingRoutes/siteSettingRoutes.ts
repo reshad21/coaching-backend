@@ -4,7 +4,7 @@ import {
   getAllSiteSettingController,
   getSiteSettingControllerById,
   updateSiteSettingController,
-} from "@/controllers/siteSettingController/siteSettingController";
+} from "../../controllers/siteSettingController/siteSettingController";
 import { Router } from "express";
 
 const siteSettingRouts = Router();

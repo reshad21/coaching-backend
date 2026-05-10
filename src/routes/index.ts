@@ -17,8 +17,8 @@ const protectedRoutes = [
   { path: "/student", route: studentRouts },
   { path: "/payment", route: paymentRouts },
   { path: "/cost", route: costRouts },
-  // { path: "/bulk", route: bulkSmsRouts },
-  // { path: "/site-setting", route: siteSettingRouts },
+  { path: "/bulk", route: bulkSmsRouts },
+  { path: "/site-setting", route: siteSettingRouts },
 ];
 
 const mainRouter = Router();
