@@ -9,8 +9,8 @@
     "resolveJsonModule": true,
     "moduleResolution": "bundler",
     "allowJs": true,
-    "outDir": "./build", // Set output directory for compiled code
-    "rootDir": "./src", // Explicitly set root directory for source files
+    "outDir": "./build",                       // Set output directory for compiled code
+    "rootDir": "./src",                        // Set root directory for input files
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
@@ -22,7 +22,8 @@
     "paths": {
       "@/*": ["src/*"],
       "@shared/*": ["../shared/*"]
-    }
+    },
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src/**/*", "prisma/**/*"], // Include all relevant source code
   "exclude": [
