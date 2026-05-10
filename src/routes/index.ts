@@ -11,7 +11,7 @@ import siteSettingRouts from "./siteSettingRoutes/siteSettingRoutes";
 
 const protectedRoutes = [
   { path: "/login", route: authRouts },
-  // { path: "/class", route: classRouts },
+  { path: "/class", route: classRouts },
   // { path: "/shift", route: shiftRouts },
   // { path: "/batch", route: batchRouts },
   // { path: "/student", route: studentRouts },
