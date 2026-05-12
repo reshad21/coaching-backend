@@ -5,12 +5,34 @@ import sendResponse from "../../utils/sendResponse";
 dotenv.config();
 import AppError from "../../errors/AppError";
 
+const normalizePhoneNumber = (phoneNumber: string) => {
+  const digitsOnly = phoneNumber.replace(/\D/g, "");
+
+  if (digitsOnly.startsWith("880")) {
+    return digitsOnly;
+  }
+
+  if (digitsOnly.startsWith("0") && digitsOnly.length === 11) {
+    return `88${digitsOnly}`;
+  }
+
+  return digitsOnly;
+};
+
+const normalizePhoneNumbers = (phoneNumbers: string) =>
+  phoneNumbers
+    .split(",")
+    .map((phoneNumber) => normalizePhoneNumber(phoneNumber.trim()))
+    .filter(Boolean)
+    .join(",");
+
 const sendSmsRequest = async (phoneNumbers: string, message: string) => {
   const apiKey = process.env.API_KEY;
   const senderId = process.env.SENDER_ID;
+  const normalizedPhoneNumbers = normalizePhoneNumbers(phoneNumbers);
 
   console.log("[SMS] Sending request:", {
-    phoneNumbers,
+    phoneNumbers: normalizedPhoneNumbers,
     hasApiKey: !!apiKey,
     hasSenderId: !!senderId,
   });
@@ -21,7 +43,7 @@ const sendSmsRequest = async (phoneNumbers: string, message: string) => {
     throw new AppError(500, errMsg);
   }
 
-  const url = `https://bulksmsbd.com/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
+  const url = `http://139.99.39.237/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(normalizedPhoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
 
   console.log("[SMS] Request URL:", url.replace(apiKey, "***"));
 
