@@ -11,26 +11,47 @@ const sendSmsRequest = async (phoneNumbers: string, message: string) => {
   const apiKey = process.env.API_KEY;
   const senderId = process.env.SENDER_ID;
 
+  console.log("[SMS] Sending request:", {
+    phoneNumbers,
+    hasApiKey: !!apiKey,
+    hasSenderId: !!senderId,
+  });
+
   if (!apiKey || !senderId) {
-    throw new AppError(500, "SMS service is not configured");
+    const errMsg = `SMS service not configured: API_KEY=${!!apiKey}, SENDER_ID=${!!senderId}`;
+    console.error("[SMS]", errMsg);
+    throw new AppError(500, errMsg);
   }
 
   const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
 
-  const result = await fetch(url, {
-    method: "GET",
-  });
-
-  const rawBody = await result.text();
-
-  if (!result.ok) {
-    throw new AppError(result.status, rawBody || "SMS provider request failed");
-  }
+  console.log("[SMS] Request URL:", url.replace(apiKey, "***"));
 
   try {
-    return JSON.parse(rawBody);
-  } catch {
-    return rawBody;
+    const result = await fetch(url, {
+      method: "GET",
+    });
+
+    const rawBody = await result.text();
+    console.log("[SMS] Response status:", result.status, "body:", rawBody);
+
+    if (!result.ok) {
+      const errorMsg = `SMS provider error: ${result.status} - ${rawBody}`;
+      console.error("[SMS]", errorMsg);
+      throw new AppError(
+        result.status,
+        rawBody || "SMS provider request failed",
+      );
+    }
+
+    try {
+      return JSON.parse(rawBody);
+    } catch {
+      return rawBody;
+    }
+  } catch (error) {
+    console.error("[SMS] Fetch error:", error);
+    throw error;
   }
 };
 
