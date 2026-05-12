@@ -1,4 +1,4 @@
-import { CreateAcademicCostController, getAcademicCostControllerById, getAllAcademicCostController, updateAcademicCostController } from "@/controllers/costingController/costingController";
+import { CreateAcademicCostController, getAcademicCostControllerById, getAllAcademicCostController, updateAcademicCostController } from "../../controllers/costingController/costingController";
 
 import { Router } from "express";
 

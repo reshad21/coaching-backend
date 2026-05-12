@@ -1,7 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
+
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 
 export const createSiteSettingController = catchAsync(async (req, res) => {
   const { brandName, logo, favicon } = req?.body;
