@@ -1,5 +1,5 @@
 
-import { createStudentController, deleteStudentController, getAllStudentController, getStudentControllerById, updateStudentController } from "@/controllers/studentController/studentController";
+import { createStudentController, deleteStudentController, getAllStudentController, getStudentControllerById, updateStudentController } from "../../controllers/studentController/studentController";
 import { Router } from "express";
 
 const studentRouts = Router();

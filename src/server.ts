@@ -1,63 +1,34 @@
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
-import { globalErrorHandler } from "./middleware/golobalErrorHandler";
 import mainRouter from "./routes";
-import { seedUser } from "./SeedUser/seedUser";
-import notFound from "./utils/notFound";
 
 dotenv.config();
-const envFile =
-  process.env.NODE_ENV === "production"
-    ? ".env.production"
-    : ".env.development";
-
-dotenv.config({ path: envFile });
-
-const envName =
-  process.env.NODE_ENV === "production" ? "production" : "development";
-
-const port = process.env.PORT!;
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-const allowedOrigins = [
-  "https://coachingdevelopfrontend.vercel.app",
-  "https://coachingdevelopfrontend-rkgkw4yhd-reshad21s-projects.vercel.app",
-  "http://localhost:5173", // Optional: if you want local dev too
-];
 
-const corsOptions = {
-  origin: function (origin: string | undefined, callback: Function) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.error("Blocked origin:", origin);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
-    }
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (origin.includes("localhost")) return callback(null, true);
+    if (origin.endsWith(".vercel.app")) return callback(null, true);
+    return callback(null, true);
   },
   credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-app.use(cors(corsOptions));
+}));
 
-// Handle preflight requests explicitly
-app.options("*", cors(corsOptions));
-
-app.use("/api/", mainRouter);
+app.use("/api", mainRouter);
 
 app.get("/", (req, res) => {
   res.json({
     success: true,
-    message: `🎯 Coaching Backend Server is running on ${envName} environment (Port: ${port})`,
-    environment: envName,
-    timestamp: new Date().toISOString(),
+    message: "Server running fine",
   });
 });
-
-// Do NOT call app.listen() for Vercel
 
 export default app;

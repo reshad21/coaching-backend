@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
-import { QueryBuilder } from "@/builders/builders";
-import AppError from "@/errors/AppError";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
+import prisma from "../../db/db";
+import AppError from "../../errors/AppError";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { QueryBuilder } from "../../builders/builders";
 
 export const createStudentController = catchAsync(async (req, res) => {
   const {

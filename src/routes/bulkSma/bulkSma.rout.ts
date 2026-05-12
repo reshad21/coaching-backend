@@ -5,7 +5,7 @@ import {
   classBulkMsgController,
   shiftBulkMsgController,
   singleMessageMsgController,
-} from "@/controllers/bulkSms/bulkSms";
+} from "../../controllers/bulkSms/bulkSms";
 import { Router } from "express";
 
 const bulkSmsRouts = Router();

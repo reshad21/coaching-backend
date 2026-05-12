@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
-import { QueryBuilder } from "@/builders/builders";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
+import prisma from "../../db/db";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { QueryBuilder } from "../../builders/builders";
 
 export const paymentStudentController = catchAsync(async (req, res) => {
   const amount = Number(req.body.amount);
@@ -23,7 +21,6 @@ export const paymentStudentController = catchAsync(async (req, res) => {
   });
 });
 
-
 export const getAllStudentPaymentController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
@@ -34,7 +31,7 @@ export const getAllStudentPaymentController = catchAsync(async (req, res) => {
     .paginate()
     .fields()
     .include({
-      Student: true
+      Student: true,
     })
     .execute();
 
@@ -47,26 +44,27 @@ export const getAllStudentPaymentController = catchAsync(async (req, res) => {
   });
 });
 
+export const getSingleStudentPaymentControllerById = catchAsync(
+  async (req, res) => {
+    const { id } = req?.params;
 
-export const getSingleStudentPaymentControllerById = catchAsync(async (req, res) => {
-  const { id } = req?.params;
+    const result = await prisma.student.findFirst({
+      where: {
+        id,
+      },
+      include: {
+        Payment: true,
+      },
+    });
 
-  const result = await prisma.student.findFirst({
-    where: {
-      id,
-    },
-    include: {
-      Payment: true,
-    }
-  });
-
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Get single student payment data successful",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Get single student payment data successful",
+      data: result,
+    });
+  },
+);
 
 export const updateStudentPaymentController = catchAsync(async (req, res) => {
   const { id } = req.params;
@@ -104,15 +102,17 @@ export const getTotalIncomeController = catchAsync(async (req, res) => {
   const now = new Date();
 
   const getTotal = async (start: Date, end: Date) =>
-    (await prisma.payment.aggregate({
-      _sum: { amount: true },
-      where: { createdAt: { gte: start, lt: end } },
-    }))?._sum?.amount || 0;
+    (
+      await prisma.payment.aggregate({
+        _sum: { amount: true },
+        where: { createdAt: { gte: start, lt: end } },
+      })
+    )?._sum?.amount || 0;
 
   // Daily
   const dailyTotal = await getTotal(
     new Date(now.getFullYear(), now.getMonth(), now.getDate()),
-    new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1)
+    new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1),
   );
 
   // Weekly
@@ -126,13 +126,13 @@ export const getTotalIncomeController = catchAsync(async (req, res) => {
   // Monthly
   const monthlyTotal = await getTotal(
     new Date(now.getFullYear(), now.getMonth(), 1),
-    new Date(now.getFullYear(), now.getMonth() + 1, 1)
+    new Date(now.getFullYear(), now.getMonth() + 1, 1),
   );
 
   // Yearly
   const yearlyTotal = await getTotal(
     new Date(now.getFullYear(), 0, 1),
-    new Date(now.getFullYear() + 1, 0, 1)
+    new Date(now.getFullYear() + 1, 0, 1),
   );
 
   // Custom range
@@ -158,16 +158,21 @@ export const getTotalIncomeController = catchAsync(async (req, res) => {
     from.setHours(0, 0, 0, 0);
     to.setHours(23, 59, 59, 999);
 
-    customTotal = await prisma.payment.aggregate({
-      _sum: { amount: true },
-      where: { createdAt: { gte: from, lte: to } },
-    }).then(r => r._sum.amount || 0);
+    customTotal = await prisma.payment
+      .aggregate({
+        _sum: { amount: true },
+        where: { createdAt: { gte: from, lte: to } },
+      })
+      .then((r) => r._sum.amount || 0);
   }
 
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: fromStr && toStr ? "Fetched total income by custom period" : "Fetched total income by period",
+    message:
+      fromStr && toStr
+        ? "Fetched total income by custom period"
+        : "Fetched total income by period",
     data: {
       daily: dailyTotal,
       weekly: weeklyTotal,
@@ -177,9 +182,3 @@ export const getTotalIncomeController = catchAsync(async (req, res) => {
     },
   });
 });
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-import { getAllStudentPaymentController, getSingleStudentPaymentControllerById, getTotalIncomeController, paymentStudentController, updateStudentPaymentController } from "@/controllers/payment/paymentController";
+import { getAllStudentPaymentController, getSingleStudentPaymentControllerById, getTotalIncomeController, paymentStudentController, updateStudentPaymentController } from "../../controllers/payment/paymentController";
 
 import { Router } from "express";
 

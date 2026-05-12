@@ -4,7 +4,7 @@ import {
   getAllClassController,
   getClassControllerById,
   updateClassController,
-} from "@/controllers/classController/classController";
+} from "../../controllers/classController/classController";
 import { Router } from "express";
 
 const classRouts = Router();

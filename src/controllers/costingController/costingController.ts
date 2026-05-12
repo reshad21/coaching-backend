@@ -1,9 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-import { QueryBuilder } from "@/builders/builders";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
-
+import prisma from "../../db/db";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { QueryBuilder } from "../../builders/builders";
 
 export const CreateAcademicCostController = catchAsync(async (req, res) => {
   const {
@@ -57,10 +55,8 @@ export const CreateAcademicCostController = catchAsync(async (req, res) => {
     const updatedInstructorSalary =
       (existingCost.instructorSalary ?? 0) + salary;
     const updatedMaterialCost = (existingCost.materialCost ?? 0) + materials;
-    const updatedRentAndUtilities =
-      (existingCost.rentAndUtilities ?? 0) + rent;
-    const updatedMarketingCost =
-      (existingCost.marketingCost ?? 0) + marketing;
+    const updatedRentAndUtilities = (existingCost.rentAndUtilities ?? 0) + rent;
+    const updatedMarketingCost = (existingCost.marketingCost ?? 0) + marketing;
     const updatedOtherExpenses = (existingCost.otherExpenses ?? 0) + others;
 
     const updatedTotalCost =
@@ -113,13 +109,18 @@ export const CreateAcademicCostController = catchAsync(async (req, res) => {
   });
 });
 
-
-
 export const getAllAcademicCostController = catchAsync(async (req, res) => {
   // const result = await prisma.student.findMany();
 
   const result = await new QueryBuilder("coachingCost", req.query)
-    .search(["instructorSalary", "month", "materialCost", "rentAndUtilities", "marketingCost", "otherExpenses"])
+    .search([
+      "instructorSalary",
+      "month",
+      "materialCost",
+      "rentAndUtilities",
+      "marketingCost",
+      "otherExpenses",
+    ])
     .filter()
     .sort()
     .paginate()

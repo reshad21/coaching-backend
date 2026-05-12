@@ -1,10 +1,7 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
-import { QueryBuilder } from "@/builders/builders";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
-
+import prisma from "../../db/db";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
+import { QueryBuilder } from "../../builders/builders";
 
 export const createShiftController = catchAsync(async (req, res) => {
   const { shiftName } = req?.body;
@@ -62,15 +59,15 @@ export const getAllShiftStudentController = catchAsync(async (req, res) => {
     select: {
       shiftName: true,
       Student: {
-        select: { id: true } // only need id for count
-      }
+        select: { id: true }, // only need id for count
+      },
     },
   });
 
   // Total students count across all shifts
   const totalStudents = shifts.reduce(
     (sum, shift) => sum + shift.Student.length,
-    0
+    0,
   );
 
   // Prepare result array with "shiftName percentage%"
@@ -166,7 +163,4 @@ export const updateShiftController = catchAsync(async (req, res) => {
     message: "shift updated successfully",
     data: updatedShift,
   });
-
-
-
 });
