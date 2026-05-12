@@ -1,6 +1,4 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
-
+import prisma from "../../db/db";
 import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import { QueryBuilder } from "../../builders/builders";
@@ -33,7 +31,6 @@ export const createBatchController = catchAsync(async (req, res) => {
 });
 
 export const getAllBatchController = catchAsync(async (req, res) => {
-
   const result = await new QueryBuilder("batch", req.query)
     .search(["batchName"])
     .filter()
@@ -90,16 +87,16 @@ export const getBatchInfoControllerById = catchAsync(async (req, res) => {
       Class: {
         select: {
           className: true,
-          id: true
-        }
+          id: true,
+        },
       },
       Shift: {
         select: {
           shiftName: true,
-          id: true
-        }
-      }
-    }
+          id: true,
+        },
+      },
+    },
   });
 
   sendResponse(res, {
