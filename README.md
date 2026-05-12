@@ -95,3 +95,4 @@ This project uses Prisma to interact with the database. Here are some important 
   ```bash
   npx prisma db seed
   ```
+https://coaching-backend-fkat0cn6z-reshad21s-projects.vercel.app/api/health/sms

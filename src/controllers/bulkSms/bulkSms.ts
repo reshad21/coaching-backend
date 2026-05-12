@@ -172,12 +172,30 @@ export const singleMessageMsgController = catchAsync(async (req, res) => {
   if (!number) {
     throw new AppError(400, "Phone number is required");
   }
-  const data = await sendSmsRequest(number, message);
+  try {
+    const data = await sendSmsRequest(number, message);
 
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Send Message Successfully",
-    data: data,
-  });
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Send Message Successfully",
+      data: {
+        smsSent: true,
+        smsResponse: data,
+      },
+    });
+  } catch (error) {
+    console.error("[SMS] Single message failed:", error);
+
+    sendResponse(res, {
+      statusCode: 200,
+      success: true,
+      message: "Payment completed, but SMS service is unavailable",
+      data: {
+        smsSent: false,
+        smsError:
+          error instanceof Error ? error.message : "SMS service failed",
+      },
+    });
+  }
 });
