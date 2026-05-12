@@ -1,39 +1,66 @@
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import prisma from "../../db/db";
 import dotenv from "dotenv";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 dotenv.config();
-import AppError from "@/errors/AppError";
+import AppError from "../../errors/AppError";
 
-export const bulkController = catchAsync(async (req, res) => {
-  const { message } = req.body;
+const sendSmsRequest = async (phoneNumbers: string, message: string) => {
   const apiKey = process.env.API_KEY;
   const senderId = process.env.SENDER_ID;
 
-  const phoneNumbers = "01600416187";
+  console.log("[SMS] Sending request:", {
+    phoneNumbers,
+    hasApiKey: !!apiKey,
+    hasSenderId: !!senderId,
+  });
+
+  if (!apiKey || !senderId) {
+    const errMsg = `SMS service not configured: API_KEY=${!!apiKey}, SENDER_ID=${!!senderId}`;
+    console.error("[SMS]", errMsg);
+    throw new AppError(500, errMsg);
+  }
 
   const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
 
-  const result = await fetch(url, {
-    method: "GET",
-  });
+  console.log("[SMS] Request URL:", url.replace(apiKey, "***"));
 
-  if (!result.ok) {
-    throw new AppError(500, "Failed to send Bulk SMS");
+  try {
+    const result = await fetch(url, {
+      method: "GET",
+    });
+
+    const rawBody = await result.text();
+    console.log("[SMS] Response status:", result.status, "body:", rawBody);
+
+    if (!result.ok) {
+      const errorMsg = `SMS provider error: ${result.status} - ${rawBody}`;
+      console.error("[SMS]", errorMsg);
+      throw new AppError(
+        result.status,
+        rawBody || "SMS provider request failed",
+      );
+    }
+
+    try {
+      return JSON.parse(rawBody);
+    } catch {
+      return rawBody;
+    }
+  } catch (error) {
+    console.error("[SMS] Fetch error:", error);
+    throw error;
   }
-  const data = await result.json();
-  sendResponse(res, {
-    statusCode: 200,
-    success: true,
-    message: "Class Create Successfully",
-    data: data,
-  });
+};
+
+export const bulkController = catchAsync(async (req, res) => {
+  const { message } = req.body;
+  const phoneNumbers = "01600416187";
+
+  const data = await sendSmsRequest(phoneNumbers, message);
 });
 export const batchBulkMsgController = catchAsync(async (req, res) => {
   const { message, id } = req.body;
-  const apiKey = process.env.API_KEY;
-  const senderId = process.env.SENDER_ID;
 
   const response = await prisma.batch.findFirst({
     where: {
@@ -51,16 +78,7 @@ export const batchBulkMsgController = catchAsync(async (req, res) => {
   if (!phoneNumbers) {
     throw new AppError(404, "No students found for this class or batch");
   }
-  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
-
-  const result = await fetch(url, {
-    method: "GET",
-  });
-
-  if (!result.ok) {
-    throw new AppError(500, "Failed to send Bulk SMS");
-  }
-  const data = await result.json();
+  const data = await sendSmsRequest(phoneNumbers, message);
 
   sendResponse(res, {
     statusCode: 200,
@@ -71,24 +89,13 @@ export const batchBulkMsgController = catchAsync(async (req, res) => {
 });
 export const allStudentBulkMsgController = catchAsync(async (req, res) => {
   const { message } = req.body;
-  const apiKey = process.env.API_KEY;
-  const senderId = process.env.SENDER_ID;
 
   const response = await prisma.student.findMany();
   const phoneNumbers = response?.map((s) => s.phone).join(",");
   if (!phoneNumbers) {
     throw new AppError(404, "No students found");
   }
-  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
-
-  const result = await fetch(url, {
-    method: "GET",
-  });
-
-  if (!result.ok) {
-    throw new AppError(500, "Failed to send Bulk SMS");
-  }
-  const data = await result.json();
+  const data = await sendSmsRequest(phoneNumbers, message);
 
   sendResponse(res, {
     statusCode: 200,
@@ -99,8 +106,6 @@ export const allStudentBulkMsgController = catchAsync(async (req, res) => {
 });
 export const classBulkMsgController = catchAsync(async (req, res) => {
   const { message, classId } = req.body;
-  const apiKey = process.env.API_KEY;
-  const senderId = process.env.SENDER_ID;
   const response = await prisma.class.findFirst({
     where: {
       id: classId,
@@ -118,16 +123,7 @@ export const classBulkMsgController = catchAsync(async (req, res) => {
   if (!phoneNumbers) {
     throw new AppError(404, "No students found for this class or batch");
   }
-  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
-
-  const result = await fetch(url, {
-    method: "GET",
-  });
-
-  if (!result.ok) {
-    throw new AppError(500, "Failed to send Bulk SMS");
-  }
-  const data = await result.json();
+  const data = await sendSmsRequest(phoneNumbers, message);
 
   sendResponse(res, {
     statusCode: 200,
@@ -138,8 +134,6 @@ export const classBulkMsgController = catchAsync(async (req, res) => {
 });
 export const shiftBulkMsgController = catchAsync(async (req, res) => {
   const { message, shiftId } = req.body;
-  const apiKey = process.env.API_KEY;
-  const senderId = process.env.SENDER_ID;
   const response = await prisma.shift.findFirst({
     where: {
       id: shiftId,
@@ -157,15 +151,7 @@ export const shiftBulkMsgController = catchAsync(async (req, res) => {
   if (!phoneNumbers) {
     throw new AppError(404, "No students found for this class or batch");
   }
-  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
-
-  const result = await fetch(url, {
-    method: "GET",
-  });
-  if (!result.ok) {
-    throw new AppError(500, "Failed to send Bulk SMS");
-  }
-  const data = await result.json();
+  const data = await sendSmsRequest(phoneNumbers, message);
   sendResponse(res, {
     statusCode: 200,
     success: true,
@@ -175,22 +161,11 @@ export const shiftBulkMsgController = catchAsync(async (req, res) => {
 });
 export const singleMessageMsgController = catchAsync(async (req, res) => {
   const { message, number } = req.body;
-  const apiKey = process.env.API_KEY;
-  const senderId = process.env.SENDER_ID;
 
   if (!number) {
-    throw new AppError(404, "No students found for this class or batch");
+    throw new AppError(400, "Phone number is required");
   }
-  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(number)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
-
-  const result = await fetch(url, {
-    method: "GET",
-  });
-
-  if (!result.ok) {
-    throw new AppError(500, "Failed to send SMS");
-  }
-  const data = await result.json();
+  const data = await sendSmsRequest(number, message);
 
   sendResponse(res, {
     statusCode: 200,
