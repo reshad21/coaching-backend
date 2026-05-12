@@ -1,10 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 import dotenv from "dotenv";
-import catchAsync from "@/utils/catchAsync";
-import sendResponse from "@/utils/sendResponse";
 dotenv.config();
-import AppError from "@/errors/AppError";
+import AppError from "../../errors/AppError";
+
+import catchAsync from "../../utils/catchAsync";
+import sendResponse from "../../utils/sendResponse";
 
 const sendSmsRequest = async (phoneNumbers: string, message: string) => {
   const apiKey = process.env.API_KEY;
