@@ -58,6 +58,13 @@ export const bulkController = catchAsync(async (req, res) => {
   const phoneNumbers = "01600416187";
 
   const data = await sendSmsRequest(phoneNumbers, message);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Class Create Successfully",
+    data: data,
+  });
 });
 export const batchBulkMsgController = catchAsync(async (req, res) => {
   const { message, id } = req.body;
