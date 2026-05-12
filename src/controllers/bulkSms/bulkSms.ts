@@ -21,7 +21,7 @@ const sendSmsRequest = async (phoneNumbers: string, message: string) => {
     throw new AppError(500, errMsg);
   }
 
-  const url = `http://bulksmsbd.net/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
+  const url = `https://bulksmsbd.com/api/smsapi?api_key=${apiKey}&type=text&number=${encodeURIComponent(phoneNumbers)}&senderid=${senderId}&message=${encodeURIComponent(message)}`;
 
   console.log("[SMS] Request URL:", url.replace(apiKey, "***"));
 
@@ -193,8 +193,7 @@ export const singleMessageMsgController = catchAsync(async (req, res) => {
       message: "Payment completed, but SMS service is unavailable",
       data: {
         smsSent: false,
-        smsError:
-          error instanceof Error ? error.message : "SMS service failed",
+        smsError: error instanceof Error ? error.message : "SMS service failed",
       },
     });
   }
